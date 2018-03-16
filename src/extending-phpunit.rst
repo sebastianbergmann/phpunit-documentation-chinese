@@ -181,60 +181,6 @@ PHPUnit\\Framework\\TestCase 的子类
 
 在:ref:`appendixes.configuration.test-listeners`中可以看到如何配置 PHPUnit 来将测试监听器附加到测试执行过程上。
 
-.. _extending-phpunit.PHPUnit_Extensions_TestDecorator:
-
-从 PHPUnit_Extensions_TestDecorator 派生子类
-#######################################
-
-可以将测试用例或者测试套件包装在 ``PHPUnit_Extensions_TestDecorator`` 的子类中并运用 Decorator（修饰器）设计模式来在测试运行前后执行一些动作。
-
-PHPUnit 了包含了一个具体的测试修饰器：``PHPUnit_Extensions_RepeatedTest``。它用于重复运行某个测试，并且只在全部循环中都成功时计为成功。
-
-:numref:`extending-phpunit.examples.RepeatedTest.php`展示了测试修饰器 ``PHPUnit_Extensions_RepeatedTest`` 的一个删减版本，用以说明如何编写你自己的测试修饰器。
-
-.. code-block:: php
-    :caption: RepeatedTest 修饰器
-    :name: extending-phpunit.examples.RepeatedTest.php
-
-    <?php
-    use PHPUnit\Framework\TestCase;
-
-    require_once 'PHPUnit/Extensions/TestDecorator.php';
-
-    class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
-    {
-        private $timesRepeat = 1;
-
-        public function __construct(PHPUnit_Framework_Test $test, $timesRepeat = 1)
-        {
-            parent::__construct($test);
-
-            if (is_integer($timesRepeat) &&
-                $timesRepeat >= 0) {
-                $this->timesRepeat = $timesRepeat;
-            }
-        }
-
-        public function count()
-        {
-            return $this->timesRepeat * $this->test->count();
-        }
-
-        public function run(PHPUnit_Framework_TestResult $result = null)
-        {
-            if ($result === null) {
-                $result = $this->createResult();
-            }
-
-            for ($i = 0; $i < $this->timesRepeat && !$result->shouldStop(); $i++) {
-                $this->test->run($result);
-            }
-
-            return $result;
-        }
-    }
-    ?>
-
 .. _extending-phpunit.PHPUnit_Framework_Test:
 
 实现 PHPUnit_Framework_Test
