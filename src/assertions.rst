@@ -219,7 +219,7 @@ assertContains()
 
 ``assertContains(mixed $needle, Iterator|array $haystack[, string $message = ''])``
 
-当 ``$needle`` 不是 ``$haystack``的元素时报告错误，错误讯息由 ``$message`` 指定。
+当 ``$needle`` 不是 ``$haystack`` 的元素时报告错误，错误讯息由 ``$message`` 指定。
 
 ``assertNotContains()`` 是与之相反的断言，接受相同的参数。
 
