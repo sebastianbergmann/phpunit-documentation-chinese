@@ -23,7 +23,7 @@
 
 假如把成功的测试视为绿灯、测试失败视为红灯，那么还额外需要黄灯来将测试标记为未完成或尚未实现。``PHPUnit_Framework_IncompleteTest`` 是一个标记接口，用于将测试方法抛出的异常标记为测试未完成或目前尚未实现而导致的结果。``PHPUnit_Framework_IncompleteTestError`` 是这个接口的标准实现。
 
-:numref:`incomplete-and-skipped-tests.incomplete-tests.examples.SampleTest.php`展示了一个测试用例类 ``SampleTest``，它有一个测试方法 ``testSomething()``。通过在测试方法中调用便捷方法 ``markTestIncomplete()``（会自动抛出一个 ``PHPUnit_Framework_IncompleteTestError`` 异常）将这个测试标记为未完成。
+:numref:`incomplete-and-skipped-tests.incomplete-tests.examples.SampleTest.php`展示了一个测试用例类 ``SampleTest``，它有一个测试方法 ``testSomething()``。通过在测试方法中调用便捷方法 ``markTestIncomplete()`` （会自动抛出一个 ``PHPUnit_Framework_IncompleteTestError`` 异常）将这个测试标记为未完成。
 
 .. code-block:: php
     :caption: 将测试标记为未完成
@@ -88,7 +88,7 @@
 
 并非所有测试都能在任何环境中运行。比如说，考虑这样一种情况：一个数据库抽象层，针对其所支持的各种数据库系统有多个不同的驱动程序。针对 MySQL 驱动程序的测试当然只在 MySQL 服务器可用才能运行。
 
-:numref:`incomplete-and-skipped-tests.skipping-tests.examples.DatabaseTest.php` 展示了一个测试用例类 ``DatabaseTest``，它有一个测试方法 ``testConnection()``。在测试用例类的 ``setUp()``模板方法中，检查了 MySQLi 扩展是否可用，并且在扩展不可用时用 ``markTestSkipped()`` 方法来跳过此测试。
+:numref:`incomplete-and-skipped-tests.skipping-tests.examples.DatabaseTest.php` 展示了一个测试用例类 ``DatabaseTest``，它有一个测试方法 ``testConnection()``。在测试用例类的 ``setUp()`` 模板方法中，检查了 MySQLi 扩展是否可用，并且在扩展不可用时用 ``markTestSkipped()`` 方法来跳过此测试。
 
 .. code-block:: php
     :caption: 跳过某个测试
