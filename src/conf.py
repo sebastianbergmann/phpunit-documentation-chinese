@@ -30,7 +30,7 @@ def get_version():
     if version:
         return version[2:]
     else:
-        return '(未知)'
+        return u'(未知)'
 
 highlight_language = 'php'
 
@@ -318,10 +318,10 @@ texinfo_documents = [
 numfig = True
 
 numfig_format = {
-    'code-block': '示例 %s',
-    'figure': '图表 %s',
-    'table': '表格 %s',
-    'section': '章节'
+    'code-block': u'示例 %s',
+    'figure': u'图表 %s',
+    'table': u'表格 %s',
+    'section': u'章节'
 }
 
 
