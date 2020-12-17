@@ -2,106 +2,106 @@
 
 .. _code-coverage-analysis:
 
-=======
+======================
 代码覆盖率分析
-=======
+======================
 
-    *Wikipedia*:
+    *Wikipedia*\ ：
 
     计算机科学中所说的代码覆盖率是一种用于衡量特定测试套件对程序源代码测试程度的指标。拥有高代码覆盖率的程序相较于低代码低概率的程序而言测试的更加彻底、包含软件 bug 的可能性更低。
 
-在本章中，你将学到 PHPUnit 中与代码覆盖率相关的一切功能。通过这部分功能，能够了解在测试运行过程中执行了生产代码的哪些部分。它使用了 `PHP_CodeCoverage <https://github.com/sebastianbergmann/php-code-coverage>`_ 组件，而这个组件又使用了 PHP 的 `Xdebug <http://xdebug.org/>`_ 扩展所提供的代码覆盖率功能。
+在本章中，你将学到 PHPUnit 中与代码覆盖率相关的一切功能。通过这部分功能，能够了解在测试运行过程中执行了生产代码的哪些部分。它使用了 `php-code-coverage <https://github.com/sebastianbergmann/php-code-coverage>`_ 组件，而这个组件又使用了 PHP 的 `Xdebug <https://xdebug.org/>`_ 或 `PCOV <https://github.com/krakjoe/pcov>`_ 扩展或  `PHPDBG <https://www.php.net/manual/en/book.phpdbg.php>`_ 所提供的代码覆盖率功能。
 
-.. admonition:: Note
+.. admonition:: 注
 
-   Xdebug 不随 PHPUnit 分发。如果在运行测试时收到了 Xdebug 扩展未加载的提示，就意味着 Xdebug 未安装或者未正确配置。在使用 PHPUnit 的代码覆盖率分析功能之前，需要阅读下 `Xdebug 安装指南 <http://xdebug.org/docs/install>`_。
+   如果在运行测试时看到警告信息说没有可用的代码覆盖率驱动，这意味着你正在使用 PHP 命令行二进制文件（``php``）且未加载 Xdebug 或 PCOV。
 
-PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好几种（Clover、Crap4J、PHPUnit）基于XML的代码覆盖率信息记录文件。代码覆盖率信息也能以文本格式提供（同时可以输出到STDOUT）或以PHP代码格式输出以供进一步处理。
+PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好几种（Clover、Crap4J、PHPUnit）基于 XML 的代码覆盖率信息记录文件。代码覆盖率信息也能以文本格式提供（同时可以输出到 STDOUT）或以 PHP 代码格式输出以供进一步处理。
 
-:ref:`textui`中列出了各种控制代码覆盖率功能的命令行参数供参考，同时:ref:`appendixes.configuration.logging`中可以找到其他相关的配置信息。
+:ref:`textui`\ 中列出了各种控制代码覆盖率功能的命令行参数供参考，同时\ :ref:`appendixes.configuration.logging`\ 中可以找到其他相关的配置信息。
 
 .. _code-coverage-analysis.metrics:
 
 用于代码覆盖率的软件衡量标准
-##############
+##################################
 
 目前存在多种软件衡量标准用于衡量代码覆盖率：
 
-*行覆盖率(Line Coverage)*
+*行覆盖率（Line Coverage）*
 
-    *行覆盖率(Line Coverage)*按单个可执行行是否已执行到进行计量。
+    *行覆盖率（Line Coverage）*\ 按单个可执行行是否已执行进行计量。
 
-*函数与方法覆盖率(Function and Method Coverage)*
+*分支覆盖率（Branch Coverage）*
 
-    *函数与方法覆盖率(Function and Method Coverage)*按单个函数或方法是否已调用到进行计量。仅当函数或方法的所有可执行行全部已覆盖时 PHP_CodeCoverage 才将其视为已覆盖。
+    *分支覆盖率（Branch Coverage）*\ 按控制结构的分支进行计量。测试套件运行时每个控制结构的布尔表达式求值为 ``true`` 和 ``false`` 各自计为一个分支。
 
-*类与特质覆盖率(Class and Trait Coverage)*
+*路径覆盖率（Path Coverage）*
 
-    *类与特质覆盖率(Class and Trait Coverage)*按单个类或特质的所有方法是否全部已覆盖进行计量。仅当一个类或性状的所有方法全部已覆盖时 PHP_CodeCoverage 才将其视为已覆盖。
+    *路径覆盖率（Path Coverage）*\ 按测试套件运行时函数或者方法内部所经历的执行路径进行计量。一个执行路径指的是从进入函数或方法一直到离开的过程中经过各个分支的特定序列。
 
-*Opcode 覆盖率(Opcode Coverage)*
+*函数与方法覆盖率（Function and Method Coverage）*
 
-    *Opcode 覆盖率*按函数或方法对应的每条 opcode 在运行测试套件时是否执行到进行计量。一行（PHP的）代码通常会编译得到多条 opcode。进行行覆盖率计量时，只要其中任何一条 opcode 被执行就视为此行已覆盖。
+    *函数与方法覆盖率（Function and Method Coverage）*\ 按单个函数或方法是否已调用进行计量。仅当函数或方法的所有可执行行全部已覆盖时 php-code-coverage 才将其视为已覆盖。
 
-*分支覆盖率(Branch Coverage)*
+*类与特质覆盖率（Class and Trait Coverage）*
 
-    *分支覆盖率(Branch Coverage)*按控制结构的分支进行计量。测试套件运行时每个控制结构的布尔表达式求值为 ``true`` 和 ``false`` 各自计为一个分支。
+    *类与特质覆盖率（Class and Trait Coverage）*\ 按单个类或特质的所有方法是否全部已覆盖进行计量。仅当一个类或特质的所有方法全部已覆盖时 php-code-coverage 才将其视为已覆盖。
 
-*路径覆盖率(Path Coverage)*
+*变更风险反模式（CRAP）指数（Change Risk Anti-Patterns (CRAP) Index）*
 
-    *路径覆盖率(Path Coverage)*按测试套件运行时函数或者方法内部所经历的执行路径进行计量。一个执行路径指的是从进入函数或方法一直到离开的过程中经过各个分支的特定序列。
+    *变更风险反模式（CRAP）指数（Change Risk Anti-Patterns (CRAP) Index）*\ 是基于代码单元的圈复杂度（cyclomatic complexity）与代码覆盖率计算得出的。不太复杂并具有恰当测试覆盖率的代码将得出较低的 CRAP 指数。可以通过编写测试或重构代码来降低其复杂性的方式来降低 CRAP 指数。
 
-*变更风险反模式(CRAP)指数(Change Risk Anti-Patterns (CRAP) Index)*
+.. _code-coverage-analysis.including-files:
 
-    *变更风险反模式(CRAP)指数(Change Risk Anti-Patterns (CRAP) Index)*是基于代码单元的圈复杂度(cyclomatic complexity)与代码覆盖率计算得出的。不太复杂并具有恰当测试覆盖率的代码将得出较低的CRAP指数。可以通过编写测试或重构代码来降低其复杂性的方式来降低CRAP指数。
+包含文件
+###############
 
-.. admonition:: Note
+为了告诉 PHPUnit 哪些源代码文件要包含在代码覆盖率报告中，必须配置过滤器。可以用\ :ref:`命令行 <textui.clioptions>`\ 选项 ``--coverage-filter`` 或通过配置文件（参见\ :ref:`appendixes.configuration.coverage.include`）来完成。
 
-   目前 PHP_CodeCoverage 尚不支持 *Opcode覆盖率*、*分支覆盖率* 及 *路径覆盖率*。
+``includeUncoveredFilesInCodeCoverageReport`` 和 ``processUncoveredFilesForCodeCoverageReport`` 配置设置可用于配置过滤器的使用方式：
 
-.. _code-coverage-analysis.whitelisting-files:
+- ``includeUncoveredFilesInCodeCoverageReport="false"`` 意味着只有至少有一行已执行代码的文件才会包括在代码覆盖率报告中
 
-将文件列入白名单
-########
+- ``includeUncoveredFilesInCodeCoverageReport="true"``\ （默认值）意味着所有文件都会包括在代码覆盖率报告中，即使文件中没有任何一行代码被执行过也一样
 
-为了告诉 PHPUnit 哪些源代码文件要包含在代码覆盖率报告中，必须配置*白名单*。可以用命令行选项 ``--whitelist`` 或通过配置文件（参见 :ref:`appendixes.configuration.whitelisting-files`）来完成。
+- ``processUncoveredFilesForCodeCoverageReport="false"``\ （默认值）意味着没有已执行代码行的文件会被加入到代码覆盖率报告中（如果设置了 ``includeUncoveredFilesInCodeCoverageReport="true"``），但它并不会被 PHPUnit 加载，因此也不会对其进行分析来获取正确的可执行代码行信息
 
-可以在 PHPUnit 的配置信息中设置 ``addUncoveredFilesFromWhitelist="true"`` 来将白名单中包含的所有文件全部加入到代码覆盖率报告中（参见:ref:`appendixes.configuration.whitelisting-files`）。这样可以把完全没有测试到的文件也一并包含到报告中。如果需要知道这些未被覆盖文件中有哪些行是可执行的，需要同时在 PHPUnit 的配置信息中设置 ``processUncoveredFilesFromWhitelist="true"``（参见:ref:`appendixes.configuration.whitelisting-files`）。
+- ``processUncoveredFilesForCodeCoverageReport="true"`` 意味着没有已执行代码行的文件会被 PHPUnit 加载，从而也能对其进行分析来获取正确的可执行代码行信息
 
-.. admonition:: Note
+.. admonition:: 注
 
-   请注意，当设置了 ``processUncoveredFilesFromWhitelist="true"`` 时将对源代码文件进行载入，这在某些情况下可能导致问题，比如，源代码文件包含有处于类或者函数作用域之外的代码。
+   请注意，当设置了 ``processUncoveredFilesForCodeCoverageReport="true"`` 时将对源代码文件进行载入，这在某些情况下可能导致问题，比如，源代码文件包含有处于类或者函数作用域之外的代码。
 
 .. _code-coverage-analysis.ignoring-code-blocks:
 
-略过代码块
-#####
+忽略代码块
+####################
 
-有时，一些代码块是无法对其进行测试的，因此希望在代码覆盖率分析中忽略它们。在 PHPUnit 中可以用 ``@codeCoverageIgnore``、``@codeCoverageIgnoreStart`` 与 ``@codeCoverageIgnoreEnd`` 标注来做到这点，如:numref:`code-coverage-analysis.ignoring-code-blocks.examples.Sample.php`中所示。
+有时，一些代码块是无法对其进行测试的，因此希望在代码覆盖率分析中忽略它们。在 PHPUnit 中可以用 ``@codeCoverageIgnore``、``@codeCoverageIgnoreStart`` 与 ``@codeCoverageIgnoreEnd`` 标注来做到这点，如\ :numref:`code-coverage-analysis.ignoring-code-blocks.examples.Sample.php` 中所示。
 
 .. code-block:: php
-    :caption: 使用 ``@codeCoverageIgnore``、``@codeCoverageIgnoreStart`` 与 ``@codeCoverageIgnoreEnd`` 标注
+    :caption: 使用 ``@codeCoverageIgnore``、``@codeCoverageIgnoreStart`` 和 ``@codeCoverageIgnoreEnd`` 标注
     :name: code-coverage-analysis.ignoring-code-blocks.examples.Sample.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
     /**
      * @codeCoverageIgnore
      */
-    class Foo
+    final class Foo
     {
-        public function bar()
+        public function bar(): void
         {
         }
     }
 
-    class Bar
+    final class Bar
     {
         /**
          * @codeCoverageIgnore
          */
-        public function foo()
+        public function foo(): void
         {
         }
     }
@@ -113,52 +113,82 @@ PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好
     }
 
     exit; // @codeCoverageIgnore
-    ?>
 
 代码中被忽略掉的行（用标注标记为忽略）将会计为已执行（如果它们是可执行的），并且不会在代码覆盖情况中被高亮标记。
 
-.. _code-coverage-analysis.specifying-covered-methods:
+.. _code-coverage-analysis.specifying-covered-parts:
 
-指明要覆盖的方法
-########
+指明覆盖的代码部分
+#############################
 
-``@covers`` 标注（参见 :ref:`appendixes.annotations.covers.tables.annotations`）可以用在测试代码中来指明测试方法想要对哪些方法进行测试。如果提供了这个信息，则只有指定方法的代码覆盖率信息会被统计。 :numref:`code-coverage-analysis.specifying-covered-methods.examples.BankAccountTest.php`展示了一个例子。
+``@covers`` 标注（参见\ :ref:`annotation documentation <appendixes.annotations.covers.tables.annotations>`\ ）可以用在测试代码中来指明测试类（或测试方法）想要对哪些代码部分进行测试。如果提供了这个信息，则可以有效过滤代码覆盖率报告，仅包含所指定的代码部分中的已执行代码。:numref:`code-coverage-analysis.specifying-covered-parts.examples.InvoiceTest.php` 展示了一个例子。
+
+
+.. admonition:: 注
+
+    如果用 ``@covers`` 标注指定了一个方法吗，那么只有所指方法会被视为已覆盖，这个方法所调用的方法不会视为已覆盖。因此，如果用\ *提取方法*\ 重构了已覆盖的方法，则需要添加相应的 ``@covers`` 标注。这就是推荐将此标注用在类作用域而非方法作用域的原因。
 
 .. code-block:: php
-    :caption: 在测试中指明欲覆盖哪些方法
-    :name: code-coverage-analysis.specifying-covered-methods.examples.BankAccountTest.php
+    :caption: 指明了要覆盖的类的测试类
+    :name: code-coverage-analysis.specifying-covered-parts.examples.InvoiceTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class BankAccountTest extends TestCase
+    /**
+     * @covers \Invoice
+     * @uses \Money
+     */
+    final class InvoiceTest extends TestCase
     {
-        protected $ba;
+        private $invoice;
 
-        protected function setUp()
+        protected function setUp(): void
+        {
+            $this->invoice = new Invoice;
+        }
+
+        public function testAmountInitiallyIsEmpty(): void
+        {
+            $this->assertEquals(new Money, $this->invoice->getAmount());
+        }
+    }
+
+.. code-block:: php
+    :caption: 指明了要覆盖哪个方法的测试
+    :name: code-coverage-analysis.specifying-covered-parts.examples.BankAccountTest.php
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class BankAccountTest extends TestCase
+    {
+        private $ba;
+
+        protected function setUp(): void
         {
             $this->ba = new BankAccount;
         }
 
         /**
-         * @covers BankAccount::getBalance
+         * @covers \BankAccount::getBalance
          */
-        public function testBalanceIsInitiallyZero()
+        public function testBalanceIsInitiallyZero(): void
         {
-            $this->assertEquals(0, $this->ba->getBalance());
+            $this->assertSame(0, $this->ba->getBalance());
         }
 
         /**
-         * @covers BankAccount::withdrawMoney
+         * @covers \BankAccount::withdrawMoney
          */
-        public function testBalanceCannotBecomeNegative()
+        public function testBalanceCannotBecomeNegative(): void
         {
             try {
                 $this->ba->withdrawMoney(1);
             }
 
             catch (BankAccountException $e) {
-                $this->assertEquals(0, $this->ba->getBalance());
+                $this->assertSame(0, $this->ba->getBalance());
 
                 return;
             }
@@ -167,16 +197,16 @@ PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好
         }
 
         /**
-         * @covers BankAccount::depositMoney
+         * @covers \BankAccount::depositMoney
          */
-        public function testBalanceCannotBecomeNegative2()
+        public function testBalanceCannotBecomeNegative2(): void
         {
             try {
                 $this->ba->depositMoney(-1);
             }
 
             catch (BankAccountException $e) {
-                $this->assertEquals(0, $this->ba->getBalance());
+                $this->assertSame(0, $this->ba->getBalance());
 
                 return;
             }
@@ -185,36 +215,35 @@ PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好
         }
 
         /**
-         * @covers BankAccount::getBalance
-         * @covers BankAccount::depositMoney
-         * @covers BankAccount::withdrawMoney
+         * @covers \BankAccount::getBalance
+         * @covers \BankAccount::depositMoney
+         * @covers \BankAccount::withdrawMoney
          */
-        public function testDepositWithdrawMoney()
+        public function testDepositWithdrawMoney(): void
         {
-            $this->assertEquals(0, $this->ba->getBalance());
+            $this->assertSame(0, $this->ba->getBalance());
             $this->ba->depositMoney(1);
-            $this->assertEquals(1, $this->ba->getBalance());
+            $this->assertSame(1, $this->ba->getBalance());
             $this->ba->withdrawMoney(1);
-            $this->assertEquals(0, $this->ba->getBalance());
+            $this->assertSame(0, $this->ba->getBalance());
         }
     }
-    ?>
 
-同时，可以用 ``@coversNothing`` 标注来指明一个测试不覆盖*任何*方法（参见:ref:`appendixes.annotations.coversNothing`）。这可以在编写集成测试时用于确保代码覆盖全部来自单元测试。
+同时，可以用 ``@coversNothing`` 标注来指明一个测试不覆盖\ *任何*\ 方法（参见\ :ref:`appendixes.annotations.coversNothing`）。这可以在编写集成测试时用于确保代码覆盖全部来自单元测试。
 
 .. code-block:: php
-    :caption: 指明测试不欲覆盖任何方法
-    :name: code-coverage-analysis.specifying-covered-methods.examples.GuestbookIntegrationTest.php
+    :caption: 指明应当不覆盖任何方法的测试
+    :name: code-coverage-analysis.specifying-covered-parts.examples.GuestbookIntegrationTest.php
 
-    <?php
-    use PHPUnit\Framework\TestCase;
+    <?php declare(strict_types=1);
+    use PHPUnit\DbUnit\TestCase
 
-    class GuestbookIntegrationTest extends PHPUnit_Extensions_Database_TestCase
+    final class GuestbookIntegrationTest extends TestCase
     {
         /**
          * @coversNothing
          */
-        public function testAddEntry()
+        public function testAddEntry(): void
         {
             $guestbook = new Guestbook();
             $guestbook->addEntry("suzy", "Hello world!");
@@ -229,23 +258,22 @@ PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好
             $this->assertTablesEqual($expectedTable, $queryTable);
         }
     }
-    ?>
 
 .. _code-coverage-analysis.edge-cases:
 
 边缘情况
-####
+##########
 
 本节中展示了一些值得注意的边缘情况，在这些边缘情况中可能出现令人迷惑的代码覆盖率信息。
 
 .. code-block:: php
     :name: code-coverage-analysis.edge-cases.examples.Sample.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    // 因为覆盖率是“基于行”而不是基于语句的，
-    // 每行只会有一种覆盖状态
+    // 因为是“基于行”的而非基于语句的覆盖率
+    // 一行始终只能有一种覆盖状态
     if (false) this_function_call_shows_up_as_covered();
 
     // 由于代码覆盖率的内部工作方式，这两行显得很特殊。
@@ -259,6 +287,3 @@ PHPUnit 可以生成基于 HTML 的代码覆盖率报告，同时也能生成好
     if (false) {
         this_call_will_never_show_up_as_covered();
     }
-    ?>
-
-

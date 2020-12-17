@@ -2,26 +2,25 @@
 
 .. _appendixes.assertions:
 
-==
+==========
 断言
-==
+==========
 
 本附录列举可用的各种断言方法。
 
 .. _appendixes.assertions.static-vs-non-static-usage-of-assertion-methods:
 
 断言方法的用法：静态 vs. 非静态
-##################
+################################################
 
-PHPUnit 的各个断言是在 PHPUnit\\Framework\\Assert 中实现的。PHPUnit\\Framework\\TestCase 则继承于 PHPUnit\\Framework\\Assert。
+PHPUnit 的各个断言是在 ``PHPUnit\Framework\Assert`` 中实现的。``PHPUnit\Framework\TestCase`` 则继承于 ``PHPUnit\Framework\Assert``。
 
-各个断言方法均声明为 static，可以从任何上下文以类似于 PHPUnit\\Framework\\Assert::assertTrue() 的方式调用，或者也可以用类似于 $this->assertTrue() 或 self::assertTrue() 的方式在扩展自 PHPUnit\\Framework\\TestCase 的类内调用。
+各个断言方法均声明为 ``static``，可以从任何上下文以类似于 ``PHPUnit\Framework\Assert::assertTrue()`` 的方式调用，或者也可以用类似于 ``$this->assertTrue()`` 或 ``self::assertTrue()`` 的方式在扩展自 ``PHPUnit\Framework\TestCase`` 的类内调用。甚至可以用全局函数封装，例如 ``assertTrue()``。
 
-实际上，只要（手工）包含了 PHPUnit 中的 :file:`src/Framework/Assert/Functions.php` 源码文件，甚至可以在任何上下文中（甚至包括扩展自 PHPUnit\\Framework\\TestCase 的类中）以诸如 assertTrue() 这样的方式来调用全局函数封装。
 
-有个常见的疑问——对于那些 PHPUnit 的新手尤甚——是究竟应该用诸如 $this->assertTrue() 还是诸如 self::assertTrue() 这样的形式来调用断言才是“正确的方式”？简而言之：没有正确方式。同时，也没有错误方式。这基本上是个人喜好问题。
+有个常见的疑问——对于那些 PHPUnit 的新手尤甚——是究竟应该用诸如 ``$this->assertTrue()`` 还是诸如 ``self::assertTrue()`` 这样的形式来调用断言才是“正确的方式”？简而言之：没有正确方式。同时，也没有错误方式。这基本上是个人喜好问题。
 
-对于大多数人而言，由于测试方法是在测试对象上调用，因此用 $this->assertTrue() 会“觉的更正确”。然而请记住断言方法是声明为 static 的，这使其可以（重）用于测试对象的作用域之外。最后，全局函数封装让开发者能再少打一些字（用 assertTrue() 代替 $this->assertTrue() 或者 self::assertTrue()）。
+对于大多数人而言，由于测试方法是在测试对象上调用，因此用 ``$this->assertTrue()`` 会“觉的更正确”。然而请记住断言方法是声明为 ``static`` 的，这使其可以（重）用于测试对象的作用域之外。最后，全局函数封装让开发者能再少打一些字（用 ``assertTrue()`` 代替 ``$this->assertTrue()`` 或者 ``self::assertTrue()``）。
 
 .. _appendixes.assertions.assertArrayHasKey:
 
@@ -38,22 +37,21 @@ assertArrayHasKey()
     :caption: assertArrayHasKey() 的用法
     :name: appendixes.assertions.assertArrayHasKey.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ArrayHasKeyTest extends TestCase
+    final class ArrayHasKeyTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertArrayHasKey('foo', ['bar' => 'baz']);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ArrayHasKeyTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -84,22 +82,21 @@ assertClassHasAttribute()
     :caption: assertClassHasAttribute() 的用法
     :name: appendixes.assertions.assertClassHasAttribute.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ClassHasAttributeTest extends TestCase
+    final class ClassHasAttributeTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertClassHasAttribute('foo', stdClass::class);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ClassHasAttributeTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -111,57 +108,6 @@ assertClassHasAttribute()
     Failed asserting that class "stdClass" has attribute "foo".
 
     /home/sb/ClassHasAttributeTest.php:6
-
-    FAILURES!
-    Tests: 1, Assertions: 1, Failures: 1.
-
-.. _appendixes.assertions.assertArraySubset:
-
-assertArraySubset()
-###################
-
-``assertArraySubset(array $subset, array $array[, bool $strict = '', string $message = ''])``
-
-当 ``$array`` 不包含 ``$subset`` 时报告错误，错误讯息由 ``$message`` 指定。
-
-``$strict`` 是一个标志，用于表明是否需要对数组中的对象进行全等判定。
-
-.. code-block:: php
-    :caption: assertArraySubset() 的用法
-    :name: appendixes.assertions.assertArraySubset.example
-
-    <?php
-    use PHPUnit\Framework\TestCase;
-
-    class ArraySubsetTest extends TestCase
-    {
-        public function testFailure()
-        {
-            $this->assertArraySubset(['config' => ['key-a', 'key-b']], ['config' => ['key-a']]);
-        }
-    }
-    ?>
-
-.. code-block:: bash
-
-    $ phpunit ArrayHasKeyTest
-    PHPUnit 4.4.0 by Sebastian Bergmann.
-
-    F
-
-    Time: 0 seconds, Memory: 5.00Mb
-
-    There was 1 failure:
-
-    1) Epilog\EpilogTest::testNoFollowOption
-    Failed asserting that an array has the subset Array &0 (
-        'config' => Array &1 (
-            0 => 'key-a'
-            1 => 'key-b'
-        )
-    ).
-
-    /home/sb/ArraySubsetTest.php:6
 
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
@@ -181,22 +127,21 @@ assertClassHasStaticAttribute()
     :caption: assertClassHasStaticAttribute() 的用法
     :name: appendixes.assertions.assertClassHasStaticAttribute.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ClassHasStaticAttributeTest extends TestCase
+    final class ClassHasStaticAttributeTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertClassHasStaticAttribute('foo', stdClass::class);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ClassHasStaticAttributeTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -217,34 +162,31 @@ assertClassHasStaticAttribute()
 assertContains()
 ################
 
-``assertContains(mixed $needle, Iterator|array $haystack[, string $message = ''])``
+``assertContains(mixed $needle, iterable $haystack[, string $message = ''])``
 
 当 ``$needle`` 不是 ``$haystack`` 的元素时报告错误，错误讯息由 ``$message`` 指定。
 
 ``assertNotContains()`` 是与之相反的断言，接受相同的参数。
 
-``assertAttributeContains()`` 和 ``assertAttributeNotContains()`` 是便捷包装(convenience wrapper)，以某个类或对象的 ``public``、``protected`` 或 ``private`` 属性为搜索范围。
-
 .. code-block:: php
     :caption: assertContains() 的用法
     :name: appendixes.assertions.assertContains.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ContainsTest extends TestCase
+    final class ContainsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertContains(4, [1, 2, 3]);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ContainsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -260,93 +202,100 @@ assertContains()
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-``assertContains(string $needle, string $haystack[, string $message = '', boolean $ignoreCase = false])``
+assertStringContainsString()
+############################
+
+``assertStringContainsString(string $needle, string $haystack[, string $message = ''])``
 
 当 ``$needle`` 不是 ``$haystack`` 的子字符串时报告错误，错误讯息由 ``$message`` 指定。
 
-如果 ``$ignoreCase`` 为 ``true``，测试将按大小写不敏感的方式进行。
+``assertStringNotContainsString()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
-    :caption: assertContains() 的用法
-    :name: appendixes.assertions.assertContains.example2
+    :caption: assertStringContainsString() 的用法
+    :name: appendixes.assertions.assertStringContainsString.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ContainsTest extends TestCase
+    final class StringContainsStringTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
-            $this->assertContains('baz', 'foobar');
+            $this->assertStringContainsString('foo', 'bar');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
-    $ phpunit ContainsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    $ phpunit StringContainsStringTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
-    F
+    F                                                                   1 / 1 (100%)
 
-    Time: 0 seconds, Memory: 5.00Mb
+    Time: 37 ms, Memory: 6.00 MB
 
     There was 1 failure:
 
-    1) ContainsTest::testFailure
-    Failed asserting that 'foobar' contains "baz".
+    1) StringContainsStringTest::testFailure
+    Failed asserting that 'bar' contains "foo".
 
-    /home/sb/ContainsTest.php:6
+    /home/sb/StringContainsStringTest.php:8
 
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-.. code-block:: php
-    :caption: 带有 $ignoreCase 参数的 assertContains() 的用法
-    :name: appendixes.assertions.assertContains.example3
+assertStringContainsStringIgnoringCase()
+########################################
 
-    <?php
+``assertStringContainsStringIgnoringCase(string $needle, string $haystack[, string $message = ''])``
+
+当 ``$needle`` 不是 ``$haystack`` 的子字符串时报告错误，错误讯息由 ``$message`` 指定。
+
+在 ``$haystack`` 中搜索 ``$needle`` 时，忽略大小写差异。
+
+``assertStringNotContainsStringIgnoringCase()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertStringContainsStringIgnoringCase() 的用法
+    :name: appendixes.assertions.assertStringContainsStringIgnoringCase.example
+
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ContainsTest extends TestCase
+    final class StringContainsStringIgnoringCaseTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
-            $this->assertContains('foo', 'FooBar');
-        }
-
-        public function testOK()
-        {
-            $this->assertContains('foo', 'FooBar', '', true);
+            $this->assertStringContainsStringIgnoringCase('foo', 'bar');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
-    $ phpunit ContainsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    $ phpunit StringContainsStringIgnoringCaseTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
-    F.
+    F                                                                   1 / 1 (100%)
 
-    Time: 0 seconds, Memory: 2.75Mb
+    Time: 40 ms, Memory: 6.00 MB
 
     There was 1 failure:
 
-    1) ContainsTest::testFailure
-    Failed asserting that 'FooBar' contains "foo".
+    1) StringContainsStringTest::testFailure
+    Failed asserting that 'bar' contains "foo".
 
-    /home/sb/ContainsTest.php:6
+    /home/sb/StringContainsStringIgnoringCaseTest.php:8
 
     FAILURES!
-    Tests: 2, Assertions: 2, Failures: 1.
+    Tests: 1, Assertions: 1, Failures: 1.
 
 .. _appendixes.assertions.assertContainsOnly:
 
 assertContainsOnly()
 ####################
 
-``assertContainsOnly(string $type, Iterator|array $haystack[, boolean $isNativeType = null, string $message = ''])``
+``assertContainsOnly(string $type, iterable $haystack[, boolean $isNativeType = null, string $message = ''])``
 
 当 ``$haystack`` 并非仅包含类型为 ``$type`` 的变量时报告错误，错误讯息由 ``$message`` 指定。
 
@@ -354,28 +303,25 @@ assertContainsOnly()
 
 ``assertNotContainsOnly()`` 是与之相反的断言，并接受相同的参数。
 
-``assertAttributeContainsOnly()`` 和 ``assertAttributeNotContainsOnly()`` 是便捷包装(convenience wrapper)，以某个类或对象的 ``public``、``protected`` 或 ``private`` 属性为搜索范围。
-
 .. code-block:: php
     :caption: assertContainsOnly() 的用法
     :name: appendixes.assertions.assertContainsOnly.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ContainsOnlyTest extends TestCase
+    final class ContainsOnlyTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertContainsOnly('string', ['1', '2', 3]);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ContainsOnlyTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -408,12 +354,12 @@ assertContainsOnlyInstancesOf()
     :caption: assertContainsOnlyInstancesOf() 的用法
     :name: appendixes.assertions.assertContainsOnlyInstancesOf.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ContainsOnlyInstancesOfTest extends TestCase
+    final class ContainsOnlyInstancesOfTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertContainsOnlyInstancesOf(
                 Foo::class,
@@ -421,12 +367,11 @@ assertContainsOnlyInstancesOf()
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ContainsOnlyInstancesOfTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -457,22 +402,21 @@ assertCount()
     :caption: assertCount() 的用法
     :name: appendixes.assertions.assertCount.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class CountTest extends TestCase
+    final class CountTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertCount(0, ['foo']);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit CountTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -497,28 +441,27 @@ assertDirectoryExists()
 
 当 ``$directory`` 所指定的目录不存在时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertDirectoryNotExists()`` 是与之相反的断言，并接受相同的参数。
+``assertDirectoryDoesNotExist()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertDirectoryExists() 的用法
     :name: appendixes.assertions.assertDirectoryExists.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DirectoryExistsTest extends TestCase
+    final class DirectoryExistsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertDirectoryExists('/path/to/directory');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DirectoryExistsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -543,28 +486,27 @@ assertDirectoryIsReadable()
 
 当 ``$directory`` 所指定的目录不是个目录或不可读时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertDirectoryNotIsReadable()`` 是与之相反的断言，并接受相同的参数。
+``assertDirectoryIsNotReadable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertDirectoryIsReadable() 的用法
     :name: appendixes.assertions.assertDirectoryIsReadable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DirectoryIsReadableTest extends TestCase
+    final class DirectoryIsReadableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertDirectoryIsReadable('/path/to/directory');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DirectoryIsReadableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -589,28 +531,27 @@ assertDirectoryIsWritable()
 
 当 ``$directory`` 所指定的目录不是个目录或不可写时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertDirectoryNotIsWritable()`` 是与之相反的断言，并接受相同的参数。
+``assertDirectoryIsNotWritable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertDirectoryIsWritable() 的用法
     :name: appendixes.assertions.assertDirectoryIsWritable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DirectoryIsWritableTest extends TestCase
+    final class DirectoryIsWritableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertDirectoryIsWritable('/path/to/directory');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DirectoryIsWritableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -637,28 +578,25 @@ assertEmpty()
 
 ``assertNotEmpty()`` 是与之相反的断言，接受相同的参数。
 
-``assertAttributeEmpty()`` 和 ``assertAttributeNotEmpty()`` 是便捷包装(convenience wrapper)，可以应用于某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性。
-
 .. code-block:: php
     :caption: assertEmpty() 的用法
     :name: appendixes.assertions.assertEmpty.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class EmptyTest extends TestCase
+    final class EmptyTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertEmpty(['foo']);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit EmptyTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -674,119 +612,6 @@ assertEmpty()
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-.. _appendixes.assertions.assertEqualXMLStructure:
-
-assertEqualXMLStructure()
-#########################
-
-``assertEqualXMLStructure(DOMElement $expectedElement, DOMElement $actualElement[, boolean $checkAttributes = false, string $message = ''])``
-
-当 ``$actualElement`` 中 DOMElement 的 XML 结构与 ``$expectedElement`` 中 DOMElement的 XML 结构不相同时报告错误，错误讯息由 ``$message`` 指定。
-
-.. code-block:: php
-    :caption: assertEqualXMLStructure() 的用法
-    :name: appendixes.assertions.assertEqualXMLStructure.example
-
-    <?php
-    use PHPUnit\Framework\TestCase;
-
-    class EqualXMLStructureTest extends TestCase
-    {
-        public function testFailureWithDifferentNodeNames()
-        {
-            $expected = new DOMElement('foo');
-            $actual = new DOMElement('bar');
-
-            $this->assertEqualXMLStructure($expected, $actual);
-        }
-
-        public function testFailureWithDifferentNodeAttributes()
-        {
-            $expected = new DOMDocument;
-            $expected->loadXML('<foo bar="true" />');
-
-            $actual = new DOMDocument;
-            $actual->loadXML('<foo/>');
-
-            $this->assertEqualXMLStructure(
-              $expected->firstChild, $actual->firstChild, true
-            );
-        }
-
-        public function testFailureWithDifferentChildrenCount()
-        {
-            $expected = new DOMDocument;
-            $expected->loadXML('<foo><bar/><bar/><bar/></foo>');
-
-            $actual = new DOMDocument;
-            $actual->loadXML('<foo><bar/></foo>');
-
-            $this->assertEqualXMLStructure(
-              $expected->firstChild, $actual->firstChild
-            );
-        }
-
-        public function testFailureWithDifferentChildren()
-        {
-            $expected = new DOMDocument;
-            $expected->loadXML('<foo><bar/><bar/><bar/></foo>');
-
-            $actual = new DOMDocument;
-            $actual->loadXML('<foo><baz/><baz/><baz/></foo>');
-
-            $this->assertEqualXMLStructure(
-              $expected->firstChild, $actual->firstChild
-            );
-        }
-    }
-    ?>
-
-.. code-block:: bash
-
-    $ phpunit EqualXMLStructureTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
-
-    FFFF
-
-    Time: 0 seconds, Memory: 5.75Mb
-
-    There were 4 failures:
-
-    1) EqualXMLStructureTest::testFailureWithDifferentNodeNames
-    Failed asserting that two strings are equal.
-    --- Expected
-    +++ Actual
-    @@ @@
-    -'foo'
-    +'bar'
-
-    /home/sb/EqualXMLStructureTest.php:9
-
-    2) EqualXMLStructureTest::testFailureWithDifferentNodeAttributes
-    Number of attributes on node "foo" does not match
-    Failed asserting that 0 matches expected 1.
-
-    /home/sb/EqualXMLStructureTest.php:22
-
-    3) EqualXMLStructureTest::testFailureWithDifferentChildrenCount
-    Number of child nodes of "foo" differs
-    Failed asserting that 1 matches expected 3.
-
-    /home/sb/EqualXMLStructureTest.php:35
-
-    4) EqualXMLStructureTest::testFailureWithDifferentChildren
-    Failed asserting that two strings are equal.
-    --- Expected
-    +++ Actual
-    @@ @@
-    -'bar'
-    +'baz'
-
-    /home/sb/EqualXMLStructureTest.php:48
-
-    FAILURES!
-    Tests: 4, Assertions: 8, Failures: 4.
-
 .. _appendixes.assertions.assertEquals:
 
 assertEquals()
@@ -798,38 +623,35 @@ assertEquals()
 
 ``assertNotEquals()`` 是与之相反的断言，接受相同的参数。
 
-``assertAttributeEquals()`` 和 ``assertAttributeNotEquals()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertEquals() 的用法
     :name: appendixes.assertions.assertEquals.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class EqualsTest extends TestCase
+    final class EqualsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertEquals(1, 0);
         }
 
-        public function testFailure2()
+        public function testFailure2(): void
         {
             $this->assertEquals('bar', 'baz');
         }
 
-        public function testFailure3()
+        public function testFailure3(): void
         {
             $this->assertEquals("foo\nbar\nbaz\n", "foo\nbah\nbaz\n");
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit EqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     FFF
 
@@ -870,66 +692,20 @@ assertEquals()
 
 如果 ``$expected`` 和 ``$actual`` 是某些特定的类型，将使用更加专门的比较方式，参阅下文。
 
-``assertEquals(float $expected, float $actual[, string $message = '', float $delta = 0])``
-
-当两个浮点数 ``$expected`` 和 ``$actual`` 之间的差值（的绝对值）大于 ``$delta`` 时报告错误，错误讯息由 ``$message`` 指定。
-
-关于为什么 ``$delta`` 参数是必须的，请阅读《`关于浮点运算，每一位计算机科学从业人员都应该知道的事实 <http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html>`_》。
-
-.. code-block:: php
-    :caption: 将assertEquals()用于浮点数时的用法
-    :name: appendixes.assertions.assertEquals.example2
-
-    <?php
-    use PHPUnit\Framework\TestCase;
-
-    class EqualsTest extends TestCase
-    {
-        public function testSuccess()
-        {
-            $this->assertEquals(1.0, 1.1, '', 0.2);
-        }
-
-        public function testFailure()
-        {
-            $this->assertEquals(1.0, 1.1);
-        }
-    }
-    ?>
-
-.. code-block:: bash
-
-    $ phpunit EqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
-
-    .F
-
-    Time: 0 seconds, Memory: 5.75Mb
-
-    There was 1 failure:
-
-    1) EqualsTest::testFailure
-    Failed asserting that 1.1 matches expected 1.0.
-
-    /home/sb/EqualsTest.php:11
-
-    FAILURES!
-    Tests: 2, Assertions: 2, Failures: 1.
-
 ``assertEquals(DOMDocument $expected, DOMDocument $actual[, string $message = ''])``
 
 当 ``$expected`` 和 ``$actual`` 这两个 DOMDocument 对象所表示的 XML 文档对应的无注释规范形式不相同时报告错误，错误讯息由 ``$message`` 指定。
 
 .. code-block:: php
-    :caption: assertEquals()应用于 DOMDocument 对象时的用法
+    :caption: 对 DOMDocument 对象使用 assertEquals() 时的用法
     :name: appendixes.assertions.assertEquals.example3
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class EqualsTest extends TestCase
+    final class EqualsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $expected = new DOMDocument;
             $expected->loadXML('<foo><bar/></foo>');
@@ -940,12 +716,11 @@ assertEquals()
             $this->assertEquals($expected, $actual);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit EqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -976,15 +751,15 @@ assertEquals()
 当 ``$expected`` 和 ``$actual`` 这两个对象的属性值不相等时报告错误，错误讯息由 ``$message`` 指定。
 
 .. code-block:: php
-    :caption: assertEquals()应用于对象时的用法
+    :caption: 对对象使用 assertEquals() 时的用法
     :name: appendixes.assertions.assertEquals.example4
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class EqualsTest extends TestCase
+    final class EqualsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $expected = new stdClass;
             $expected->foo = 'foo';
@@ -997,12 +772,11 @@ assertEquals()
             $this->assertEquals($expected, $actual);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit EqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1032,25 +806,24 @@ assertEquals()
 当 ``$expected`` 和 ``$actual`` 这两个数组不相等时报告错误，错误讯息由 ``$message`` 指定。
 
 .. code-block:: php
-    :caption: assertEquals() 应用于数组时的用法
+    :caption: 对数组使用 assertEquals() 时的用法
     :name: appendixes.assertions.assertEquals.example5
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class EqualsTest extends TestCase
+    final class EqualsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertEquals(['a', 'b', 'c'], ['a', 'c', 'd']);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit EqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1076,6 +849,256 @@ assertEquals()
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
+assertEqualsCanonicalizing()
+############################
+
+``assertEqualsCanonicalizing(mixed $expected, mixed $actual[, string $message = ''])``
+
+当两个变量 ``$expected`` 和 ``$actual`` 不相等时报告错误，错误讯息由 ``$message`` 指定。
+
+先对 ``$expected`` 和 ``$actual`` 进行规范化，然后再进行比较。例如，如果两个变量 ``$expected`` 和 ``$actual`` 是数组，则会先对这些数组进行排序然后再进行比较。当 ``$expected`` 和 ``$actual`` 是对象时，则每个对象都会被转换为一个包含所有私有、保护、和公开属性的数组。
+
+``assertNotEqualsCanonicalizing()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertEqualsCanonicalizing() 的用法
+    :name: appendixes.assertions.assertEqualsCanonicalizing.example
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class EqualsCanonicalizingTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertEqualsCanonicalizing([3, 2, 1], [2, 3, 0, 1]);
+        }
+    }
+
+.. parsed-literal::
+
+    $ phpunit EqualsCanonicalizingTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F                                                                   1 / 1 (100%)
+
+    Time: 42 ms, Memory: 6.00 MB
+
+    There was 1 failure:
+
+    1) EqualsCanonicalizingTest::testFailure
+    Failed asserting that two arrays are equal.
+    --- Expected
+    +++ Actual
+    @@ @@
+     Array (
+    -    0 => 1
+    -    1 => 2
+    -    2 => 3
+    +    0 => 0
+    +    1 => 1
+    +    2 => 2
+    +    3 => 3
+     )
+
+    /home/sb/EqualsCanonicalizingTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertEqualsIgnoringCase()
+##########################
+
+``assertEqualsIgnoringCase(mixed $expected, mixed $actual[, string $message = ''])``
+
+当两个变量 ``$expected`` 和 ``$actual`` 不相等时报告错误，错误讯息由 ``$message`` 指定。
+
+比较 ``$expected`` 和 ``$actual`` 时，忽略大小写差异。
+
+``assertNotEqualsIgnoringCase()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertEqualsIgnoringCase() 的用法
+    :name: appendixes.assertions.assertEqualsIgnoringCase.example
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class EqualsIgnoringCaseTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertEqualsIgnoringCase('foo', 'BAR');
+        }
+    }
+
+.. parsed-literal::
+
+    $ phpunit EqualsIgnoringCaseTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F                                                                   1 / 1 (100%)
+
+    Time: 51 ms, Memory: 6.00 MB
+
+    There was 1 failure:
+
+    1) EqualsIgnoringCaseTest::testFailure
+    Failed asserting that two strings are equal.
+    --- Expected
+    +++ Actual
+    @@ @@
+    -'foo'
+    +'BAR'
+
+    /home/sb/EqualsIgnoringCaseTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertEqualsWithDelta()
+#######################
+
+``assertEqualsWithDelta(mixed $expected, mixed $actual, float $delta[, string $message = ''])``
+
+当 ``$expected`` 和 ``$actual`` 之间的差的绝对值大于 ``$delta`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+请阅读《`What Every Computer Scientist Should Know About Floating-Point Arithmetic <http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html>`_》来了解为什么需要有 ``$delta``。
+
+``assertNotEqualsWithDelta()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertEqualsWithDelta() 的用法
+    :name: appendixes.assertions.assertEqualsWithDelta.example
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class EqualsWithDeltaTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertEqualsWithDelta(1.0, 1.5, 0.1);
+        }
+    }
+
+.. parsed-literal::
+
+    $ phpunit EqualsWithDeltaTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F                                                                   1 / 1 (100%)
+
+    Time: 41 ms, Memory: 6.00 MB
+
+    There was 1 failure:
+
+    1) EqualsWithDeltaTest::testFailure
+    Failed asserting that 1.5 matches expected 1.0.
+
+    /home/sb/EqualsWithDeltaTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+.. _appendixes.assertions.assertObjectEquals:
+
+assertObjectEquals()
+####################
+
+``assertObjectEquals(object $expected, object $actual, string $method = 'equals', string $message = ''])``
+
+当按照 ``$actual->$method($expected)`` 判断出 ``$actual`` 不等于 ``$expected`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+在对象上使用 ``assertEquals()``\ （以及其否断言形式 ``assertNotEquals()``）而不注册自定义比较器来定制对象的比较方式是一种不良做法。但是，很不幸地，为每个要在测试中进行断言的对象都实现自定义比较器无论如何至少也是不方便的。
+
+自定义比较器最常见的用例是值对象。这类对象一般都有一个 ``equals(self $other): bool`` 方法（或者名称不同的类似方法）用于比较这个同为值对象类型的两个实例。对于这类用例，``assertObjectEquals()`` 让自定义对象比较变得很方便：
+
+.. code-block:: php
+    :caption: assertObjectEquals() 的用法
+    :name: appendixes.assertions.assertObjectEquals.example
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class SomethingThatUsesEmailTest extends TestCase
+    {
+        public function testSomething(): void
+        {
+            $a = new Email('user@example.org');
+            $b = new Email('user@example.org');
+            $c = new Email('user@example.com');
+
+            // This passes
+            $this->assertObjectEquals($a, $b);
+
+            // This fails
+            $this->assertObjectEquals($a, $c);
+        }
+    }
+
+.. code-block:: php
+    :caption: 带有 equals() 方法的 Email 值对象
+    :name: appendixes.assertions.Email.example
+
+    <?php declare(strict_types=1);
+    final class Email
+    {
+        private string $email;
+
+        public function __construct(string $email)
+        {
+            $this->ensureIsValidEmail($email);
+
+            $this->email = $email;
+        }
+
+        public function asString(): string
+        {
+            return $this->email;
+        }
+
+        public function equals(self $other): bool
+        {
+            return $this->asString() === $other->asString();
+        }
+
+        private function ensureIsValidEmail(string $email): void
+        {
+            // ...
+        }
+    }
+
+.. parsed-literal::
+
+    $ phpunit EqualsTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F                                                                   1 / 1 (100%)
+
+    Time: 00:00.017, Memory: 4.00 MB
+
+    There was 1 failure:
+
+    1) SomethingThatUsesEmailTest::testSomething
+    Failed asserting that two objects are equal.
+    The objects are not equal according to Email::equals().
+
+    /home/sb/SomethingThatUsesEmailTest.php:16
+
+    FAILURES!
+    Tests: 1, Assertions: 2, Failures: 1.
+
+请注意：
+
+* ``$actual`` 对象必须存在名叫 ``$method`` 的方法
+* 此方法必须只接受一个参数
+* 相应的参数必须有声明类型
+* ``$expected`` 对象必须与这个声明的类型兼容
+* 此方法必须有声明为 ``bool`` 的返回类型
+
+如果以上假设中的任何一条不满足，或 ``$actual->$method($expected)`` 返回 ``false``，则断言失败。
+
 .. _appendixes.assertions.assertFalse:
 
 assertFalse()
@@ -1091,22 +1114,21 @@ assertFalse()
     :caption: assertFalse() 的用法
     :name: appendixes.assertions.assertFalse.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class FalseTest extends TestCase
+    final class FalseTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertFalse(true);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit FalseTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1137,22 +1159,21 @@ assertFileEquals()
     :caption: assertFileEquals() 的用法
     :name: appendixes.assertions.assertFileEquals.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class FileEqualsTest extends TestCase
+    final class FileEqualsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertFileEquals('/home/sb/expected', '/home/sb/actual');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit FileEqualsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1183,28 +1204,27 @@ assertFileExists()
 
 当 ``$filename`` 所指定的文件不存在时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertFileNotExists()`` 是与之相反的断言，接受相同的参数。
+``assertFileDoesNotExist()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertFileExists() 的用法
     :name: appendixes.assertions.assertFileExists.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class FileExistsTest extends TestCase
+    final class FileExistsTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertFileExists('/path/to/file');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit FileExistsTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1229,28 +1249,27 @@ assertFileIsReadable()
 
 当 ``$filename`` 所指定的文件不是个文件或不可读时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertFileNotIsReadable()`` 是与之相反的断言，并接受相同的参数。
+``assertFileIsNotReadable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertFileIsReadable() 的用法
     :name: appendixes.assertions.assertFileIsReadable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class FileIsReadableTest extends TestCase
+    final class FileIsReadableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertFileIsReadable('/path/to/file');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit FileIsReadableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1275,28 +1294,27 @@ assertFileIsWritable()
 
 当 ``$filename`` 所指定的文件不是个文件或不可写时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertFileNotIsWritable()`` 是与之相反的断言，并接受相同的参数。
+``assertFileIsNotWritable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertFileIsWritable() 的用法
     :name: appendixes.assertions.assertFileIsWritable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class FileIsWritableTest extends TestCase
+    final class FileIsWritableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertFileIsWritable('/path/to/file');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit FileIsWritableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1321,28 +1339,25 @@ assertGreaterThan()
 
 当 ``$actual`` 的值不大于 ``$expected`` 的值时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertAttributeGreaterThan()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertGreaterThan() 的用法
     :name: appendixes.assertions.assertGreaterThan.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class GreaterThanTest extends TestCase
+    final class GreaterThanTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertGreaterThan(2, 1);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit GreaterThanTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1367,28 +1382,25 @@ assertGreaterThanOrEqual()
 
 当 ``$actual`` 的值不大于且不等于 ``$expected`` 的值时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertAttributeGreaterThanOrEqual()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertGreaterThanOrEqual() 的用法
     :name: appendixes.assertions.assertGreaterThanOrEqual.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class GreatThanOrEqualTest extends TestCase
+    final class GreatThanOrEqualTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertGreaterThanOrEqual(2, 1);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit GreaterThanOrEqualTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1411,7 +1423,7 @@ assertInfinite()
 
 ``assertInfinite(mixed $variable[, string $message = ''])``
 
-当 ``$actual`` 不是  ``INF`` 时报告错误，错误讯息由 ``$message`` 指定。
+当 ``$actual`` 不是 ``INF`` 时报告错误，错误讯息由 ``$message`` 指定。
 
 ``assertFinite()`` 是与之相反的断言，接受相同的参数。
 
@@ -1419,22 +1431,21 @@ assertInfinite()
     :caption: assertInfinite() 的用法
     :name: appendixes.assertions.assertInfinite.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class InfiniteTest extends TestCase
+    final class InfiniteTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertInfinite(1);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit InfiniteTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1461,28 +1472,25 @@ assertInstanceOf()
 
 ``assertNotInstanceOf()`` 是与之相反的断言，接受相同的参数。
 
-``assertAttributeInstanceOf()`` 和 ``assertAttributeNotInstanceOf()`` 是便捷包装(convenience wrapper)，可以应用于某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性。
-
 .. code-block:: php
     :caption: assertInstanceOf() 的用法
     :name: appendixes.assertions.assertInstanceOf.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class InstanceOfTest extends TestCase
+    final class InstanceOfTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertInstanceOf(RuntimeException::class, new Exception);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit InstanceOfTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1498,39 +1506,34 @@ assertInstanceOf()
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-.. _appendixes.assertions.assertInternalType:
+assertIsArray()
+###############
 
-assertInternalType()
-####################
+``assertIsArray($actual[, $message = ''])``
 
-``assertInternalType($expected, $actual[, $message = ''])``
+当 ``$actual`` 的类型不是 ``array`` 时报告错误，错误讯息由 ``$message`` 指定。
 
-当 ``$actual`` 不是 ``$expected`` 所指明的类型时报告错误，错误讯息由 ``$message`` 指定。
-
-``assertNotInternalType()`` 是与之相反的断言，接受相同的参数。
-
-``assertAttributeInternalType()`` 和 ``assertAttributeNotInternalType()`` 是便捷包装(convenience wrapper)，可以应用于某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性。
+``assertIsNotArray()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
-    :caption: assertInternalType() 的用法
-    :name: appendixes.assertions.assertInternalType.example
+    :caption: assertIsArray() 的用法
+    :name: appendixes.assertions.assertIsArray.example
 
     <?php
     use PHPUnit\Framework\TestCase;
 
-    class InternalTypeTest extends TestCase
+    class ArrayTest extends TestCase
     {
         public function testFailure()
         {
-            $this->assertInternalType('string', 42);
+            $this->assertIsArray(null);
         }
     }
-    ?>
 
 .. code-block:: bash
 
-    $ phpunit InternalTypeTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    $ phpunit ArrayTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1538,10 +1541,440 @@ assertInternalType()
 
     There was 1 failure:
 
-    1) InternalTypeTest::testFailure
-    Failed asserting that 42 is of type "string".
+    1) ArrayTest::testFailure
+    Failed asserting that null is of type "array".
 
-    /home/sb/InternalTypeTest.php:6
+    /home/sb/ArrayTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsBool()
+##############
+
+``assertIsBool($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``bool`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotBool()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsBool() 的用法
+    :name: appendixes.assertions.assertIsBool.example
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class BoolTest extends TestCase
+    {
+        public function testFailure(): void
+        {
+            $this->assertIsBool(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit BoolTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) BoolTest::testFailure
+    Failed asserting that null is of type "bool".
+
+    /home/sb/BoolTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsCallable()
+##################
+
+``assertIsCallable($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``callable`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotCallable()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsCallable() 的用法
+    :name: appendixes.assertions.assertIsCallable.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class CallableTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsCallable(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit CallableTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) CallableTest::testFailure
+    Failed asserting that null is of type "callable".
+
+    /home/sb/CallableTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsFloat()
+###############
+
+``assertIsFloat($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``float`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotFloat()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsFloat() 的用法
+    :name: appendixes.assertions.assertIsFloat.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class FloatTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsFloat(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit FloatTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) FloatTest::testFailure
+    Failed asserting that null is of type "float".
+
+    /home/sb/FloatTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsInt()
+#############
+
+``assertIsInt($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``int`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotInt()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsInt() 的用法
+    :name: appendixes.assertions.assertIsInt.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class IntTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsInt(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit IntTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) IntTest::testFailure
+    Failed asserting that null is of type "int".
+
+    /home/sb/IntTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsIterable()
+##################
+
+``assertIsIterable($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``iterable`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotIterable()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsIterable() 的用法
+    :name: appendixes.assertions.assertIsIterable.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class IterableTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsIterable(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit IterableTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) IterableTest::testFailure
+    Failed asserting that null is of type "iterable".
+
+    /home/sb/IterableTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsNumeric()
+#################
+
+``assertIsNumeric($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``numeric`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotNumeric()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsNumeric() 的用法
+    :name: appendixes.assertions.assertIsNumeric.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class NumericTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsNumeric(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit NumericTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) NumericTest::testFailure
+    Failed asserting that null is of type "numeric".
+
+    /home/sb/NumericTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsObject()
+################
+
+``assertIsObject($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``object`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotObject()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsObject() 的用法
+    :name: appendixes.assertions.assertIsObject.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class ObjectTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsObject(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit ObjectTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) ObjectTest::testFailure
+    Failed asserting that null is of type "object".
+
+    /home/sb/ObjectTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsResource()
+##################
+
+``assertIsResource($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``resource`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotResource()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsResource() 的用法
+    :name: appendixes.assertions.assertIsResource.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class ResourceTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsResource(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit ResourceTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) ResourceTest::testFailure
+    Failed asserting that null is of type "resource".
+
+    /home/sb/ResourceTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsScalar()
+################
+
+``assertIsScalar($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``scalar`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotScalar()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsScalar() 的用法
+    :name: appendixes.assertions.assertIsScalar.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class ScalarTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsScalar(null);
+        }
+    }
+
+.. code-block:: bash
+
+    $ phpunit ScalarTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) ScalarTest::testFailure
+    Failed asserting that null is of type "scalar".
+
+    /home/sb/ScalarTest.php:8
+
+    FAILURES!
+    Tests: 1, Assertions: 1, Failures: 1.
+
+assertIsString()
+################
+
+``assertIsString($actual[, $message = ''])``
+
+当 ``$actual`` 的类型不是 ``string`` 时报告错误，错误讯息由 ``$message`` 指定。
+
+``assertIsNotString()`` 是与之相反的断言，接受相同的参数。
+
+.. code-block:: php
+    :caption: assertIsString() 的用法
+    :name: appendixes.assertions.assertIsString.example
+
+    <?php
+    use PHPUnit\Framework\TestCase;
+
+    class StringTest extends TestCase
+    {
+        public function testFailure()
+        {
+            $this->assertIsString(null);
+        }
+    }
+
+.. parsed-literal::
+
+    $ phpunit StringTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    F
+
+    Time: 0 seconds, Memory: 5.00Mb
+
+    There was 1 failure:
+
+    1) StringTest::testFailure
+    Failed asserting that null is of type "string".
+
+    /home/sb/StringTest.php:8
 
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
@@ -1555,28 +1988,27 @@ assertIsReadable()
 
 当 ``$filename`` 所指定的文件或目录不可读时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertNotIsReadable()`` 是与之相反的断言，并接受相同的参数。
+``assertIsNotReadable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertIsReadable() 的用法
     :name: appendixes.assertions.assertIsReadable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class IsReadableTest extends TestCase
+    final class IsReadableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertIsReadable('/path/to/unreadable');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit IsReadableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1601,28 +2033,27 @@ assertIsWritable()
 
 当 ``$filename`` 所指定的文件或目录不可写时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertNotIsWritable()`` 是与之相反的断言，并接受相同的参数。
+``assertIsNotWritable()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
     :caption: assertIsWritable() 的用法
     :name: appendixes.assertions.assertIsWritable.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class IsWritableTest extends TestCase
+    final class IsWritableTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertIsWritable('/path/to/unwritable');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit IsWritableTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1651,23 +2082,22 @@ assertJsonFileEqualsJsonFile()
     :caption: assertJsonFileEqualsJsonFile() 的用法
     :name: appendixes.assertions.assertJsonFileEqualsJsonFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class JsonFileEqualsJsonFileTest extends TestCase
+    final class JsonFileEqualsJsonFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertJsonFileEqualsJsonFile(
               'path/to/fixture/file', 'path/to/actual/file');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit JsonFileEqualsJsonFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1696,24 +2126,23 @@ assertJsonStringEqualsJsonFile()
     :caption: assertJsonStringEqualsJsonFile() 的用法
     :name: appendixes.assertions.assertJsonStringEqualsJsonFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class JsonStringEqualsJsonFileTest extends TestCase
+    final class JsonStringEqualsJsonFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertJsonStringEqualsJsonFile(
                 'path/to/fixture/file', json_encode(['Mascot' => 'ux'])
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit JsonStringEqualsJsonFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1742,12 +2171,12 @@ assertJsonStringEqualsJsonString()
     :caption: assertJsonStringEqualsJsonString() 的用法
     :name: appendixes.assertions.assertJsonStringEqualsJsonString.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class JsonStringEqualsJsonStringTest extends TestCase
+    final class JsonStringEqualsJsonStringTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertJsonStringEqualsJsonString(
                 json_encode(['Mascot' => 'Tux']),
@@ -1755,12 +2184,11 @@ assertJsonStringEqualsJsonString()
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit JsonStringEqualsJsonStringTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1792,28 +2220,25 @@ assertLessThan()
 
 当 ``$actual`` 的值不小于 ``$expected`` 的值时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertAttributeLessThan()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertLessThan() 的用法
     :name: appendixes.assertions.assertLessThan.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class LessThanTest extends TestCase
+    final class LessThanTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertLessThan(1, 2);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit LessThanTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1838,28 +2263,25 @@ assertLessThanOrEqual()
 
 当 ``$actual`` 的值不小于且不等于 ``$expected`` 的值时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertAttributeLessThanOrEqual()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertLessThanOrEqual() 的用法
     :name: appendixes.assertions.assertLessThanOrEqual.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class LessThanOrEqualTest extends TestCase
+    final class LessThanOrEqualTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertLessThanOrEqual(1, 2);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit LessThanOrEqualTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1882,28 +2304,27 @@ assertNan()
 
 ``assertNan(mixed $variable[, string $message = ''])``
 
-当 ``$variable`` 不是  ``NAN`` 时报告错误，错误讯息由 ``$message`` 指定。
+当 ``$variable`` 不是 ``NAN`` 时报告错误，错误讯息由 ``$message`` 指定。
 
 .. code-block:: php
-    :caption: assertNan() 的用法
+    :caption:  assertNan() 的用法
     :name: appendixes.assertions.assertNan.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class NanTest extends TestCase
+    final class NanTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertNan(1);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit NanTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1931,25 +2352,24 @@ assertNull()
 ``assertNotNull()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
-    :caption: assertNull() 的使用
+    :caption: assertNull() 的用法
     :name: appendixes.assertions.assertNull.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class NullTest extends TestCase
+    final class NullTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertNull('foo');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit NotNullTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -1980,22 +2400,21 @@ assertObjectHasAttribute()
     :caption: assertObjectHasAttribute() 的用法
     :name: appendixes.assertions.assertObjectHasAttribute.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ObjectHasAttributeTest extends TestCase
+    final class ObjectHasAttributeTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertObjectHasAttribute('foo', new stdClass);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ObjectHasAttributeTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2011,37 +2430,36 @@ assertObjectHasAttribute()
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-.. _appendixes.assertions.assertRegExp:
+.. _appendixes.assertions.assertMatchesRegularExpression:
 
-assertRegExp()
-##############
+assertMatchesRegularExpression()
+################################
 
-``assertRegExp(string $pattern, string $string[, string $message = ''])``
+``assertMatchesRegularExpression(string $pattern, string $string[, string $message = ''])``
 
 当 ``$string`` 不匹配于正则表达式 ``$pattern`` 时报告错误，错误讯息由 ``$message`` 指定。
 
-``assertNotRegExp()`` 是与之相反的断言，接受相同的参数。
+``assertDoesNotMatchRegularExpression()`` 是与之相反的断言，接受相同的参数。
 
 .. code-block:: php
-    :caption: assertRegExp() 的用法
-    :name: appendixes.assertions.assertRegExp.example
+    :caption: assertMatchesRegularExpression() 的用法
+    :name: appendixes.assertions.assertMatchesRegularExpression.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class RegExpTest extends TestCase
+    final class RegExpTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
-            $this->assertRegExp('/foo/', 'bar');
+            $this->assertMatchesRegularExpression('/foo/', 'bar');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit RegExpTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2072,22 +2490,21 @@ assertStringMatchesFormat()
     :caption: assertStringMatchesFormat() 的用法
     :name: appendixes.assertions.assertStringMatchesFormat.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StringMatchesFormatTest extends TestCase
+    final class StringMatchesFormatTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertStringMatchesFormat('%i', 'foo');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit StringMatchesFormatTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2149,6 +2566,10 @@ assertStringMatchesFormat()
 
   ``%c``：单个任意字符。
 
+-
+
+  ``%%``：原本的百分比字符：``%``。
+
 .. _appendixes.assertions.assertStringMatchesFormatFile:
 
 assertStringMatchesFormatFile()
@@ -2164,22 +2585,21 @@ assertStringMatchesFormatFile()
     :caption: assertStringMatchesFormatFile() 的用法
     :name: appendixes.assertions.assertStringMatchesFormatFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StringMatchesFormatFileTest extends TestCase
+    final class StringMatchesFormatFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertStringMatchesFormatFile('/path/to/expected.txt', 'foo');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit StringMatchesFormatFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2207,28 +2627,25 @@ assertSame()
 
 ``assertNotSame()`` 是与之相反的断言，接受相同的参数。
 
-``assertAttributeSame()`` 和 ``assertAttributeNotSame()`` 是便捷包装(convenience wrapper)，以某个类或对象的某个 ``public``、``protected`` 或 ``private`` 属性作为实际值来进行比较。
-
 .. code-block:: php
     :caption: assertSame() 的用法
     :name: appendixes.assertions.assertSame.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class SameTest extends TestCase
+    final class SameTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertSame('2204', 2204);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit SameTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2249,25 +2666,24 @@ assertSame()
 当两个变量 ``$expected`` 和 ``$actual`` 不是指向同一个对象的引用时报告错误，错误讯息由 ``$message`` 指定。
 
 .. code-block:: php
-    :caption: assertSame() 应用于对象时的用法
+    :caption: 对对象使用 assertSame() 时的用法
     :name: appendixes.assertions.assertSame.example2
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class SameTest extends TestCase
+    final class SameTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertSame(new stdClass, new stdClass);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit SameTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2298,22 +2714,21 @@ assertStringEndsWith()
     :caption: assertStringEndsWith() 的用法
     :name: appendixes.assertions.assertStringEndsWith.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StringEndsWithTest extends TestCase
+    final class StringEndsWithTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertStringEndsWith('suffix', 'foo');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit StringEndsWithTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2344,22 +2759,21 @@ assertStringEqualsFile()
     :caption: assertStringEqualsFile() 的用法
     :name: appendixes.assertions.assertStringEqualsFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StringEqualsFileTest extends TestCase
+    final class StringEqualsFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertStringEqualsFile('/home/sb/expected', 'actual');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit StringEqualsFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2396,22 +2810,21 @@ assertStringStartsWith()
     :caption: assertStringStartsWith() 的用法
     :name: appendixes.assertions.assertStringStartsWith.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StringStartsWithTest extends TestCase
+    final class StringStartsWithTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertStringStartsWith('prefix', 'foo');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit StringStartsWithTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2432,9 +2845,9 @@ assertStringStartsWith()
 assertThat()
 ############
 
-可以用 ``PHPUnit_Framework_Constraint`` 类来订立更加复杂的断言。随后可以用 ``assertThat()`` 方法来评定这些断言。:numref:`appendixes.assertions.assertThat.example` 展示了如何用 ``logicalNot()`` 和 ``equalTo()`` 约束条件来表达与 ``assertNotEquals()`` 等价的断言。
+可以用 ``PHPUnit\Framework\Constraint`` 类来订立更加复杂的断言。随后可以用 ``assertThat()`` 方法来评定这些断言。:numref:`appendixes.assertions.assertThat.example` 展示了如何用 ``logicalNot()`` 和 ``equalTo()`` 约束条件来表达与 ``assertNotEquals()`` 等价的断言。
 
-``assertThat(mixed $value, PHPUnit_Framework_Constraint $constraint[, $message = ''])``
+``assertThat(mixed $value, PHPUnit\Framework\Constraint $constraint[, $message = ''])``
 
 当 ``$value`` 不符合约束条件 ``$constraint`` 时报告错误，错误讯息由 ``$message`` 指定。
 
@@ -2442,12 +2855,12 @@ assertThat()
     :caption: assertThat() 的用法
     :name: appendixes.assertions.assertThat.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class BiscuitTest extends TestCase
+    final class BiscuitTest extends TestCase
     {
-        public function testEquals()
+        public function testEquals(): void
         {
             $theBiscuit = new Biscuit('Ginger');
             $myBiscuit  = new Biscuit('Ginger');
@@ -2460,9 +2873,8 @@ assertThat()
             );
         }
     }
-    ?>
 
-:numref:`appendixes.assertions.assertThat.tables.constraints`列举了所有可用的 ``PHPUnit_Framework_Constraint`` 类。
+:numref:`appendixes.assertions.assertThat.tables.constraints` 列举了所有可用的 ``PHPUnit\Framework\Constraint`` 类。
 
 .. rst-class:: table
 .. list-table:: 约束条件
@@ -2471,72 +2883,68 @@ assertThat()
 
     * - 约束条件
       - 含义
-    * - ``PHPUnit_Framework_Constraint_Attribute attribute(PHPUnit_Framework_Constraint $constraint, $attributeName)``
-      - 此约束将另外一个约束应用于某个类或对象的某个属性。
-    * - ``PHPUnit_Framework_Constraint_IsAnything anything()``
+    * - ``PHPUnit\Framework\Constraint\IsAnything anything()``
       - 此约束接受任意输入值。
-    * - ``PHPUnit_Framework_Constraint_ArrayHasKey arrayHasKey(mixed $key)``
-      - 此约束断言所评定的数组拥有指定键名。
-    * - ``PHPUnit_Framework_Constraint_TraversableContains contains(mixed $value)``
-      - 此约束断言所评定的 ``array`` 或实现了 ``Iterator`` 接口的对象包含有给定值。
-    * - ``PHPUnit_Framework_Constraint_TraversableContainsOnly containsOnly(string $type)``
-      - 此约束断言所评定的 ``array`` 或实现了 ``Iterator`` 接口的对象仅包含给定类型的值。
-    * - ``PHPUnit_Framework_Constraint_TraversableContainsOnly containsOnlyInstancesOf(string $classname)``
-      - 此约束断言所评定的 ``array`` 或实现了 ``Iterator`` 接口的对象仅包含给定类名的类的实例。
-    * - ``PHPUnit_Framework_Constraint_IsEqual equalTo($value, $delta = 0, $maxDepth = 10)``
+    * - ``PHPUnit\Framework\Constraint\ArrayHasKey arrayHasKey(mixed $key)``
+      - 此约束断言数组拥有指定键名。
+    * - ``PHPUnit\Framework\Constraint\TraversableContains contains(mixed $value)``
+      - 此约束断言 ``array`` 或实现了 ``Iterator`` 接口的对象包含有给定值。
+    * - ``PHPUnit\Framework\Constraint\TraversableContainsOnly containsOnly(string $type)``
+      - 此约束断言 ``array`` 或实现了 ``Iterator`` 接口的对象仅包含给定类型的值。
+    * - ``PHPUnit\Framework\Constraint\TraversableContainsOnly containsOnlyInstancesOf(string $classname)``
+      - 此约束断言 ``array`` 或实现了 ``Iterator`` 接口的对象仅包含给定类名的类的实例。
+    * - ``PHPUnit\Framework\Constraint\IsEqual equalTo($value, $delta = 0, $maxDepth = 10)``
       - 此约束检验一个值是否等于另外一个。
-    * - ``PHPUnit_Framework_Constraint_Attribute attributeEqualTo($attributeName, $value, $delta = 0, $maxDepth = 10)``
-      - 此约束检验一个值是否等于某个类或对象的某个属性。
-    * - ``PHPUnit_Framework_Constraint_DirectoryExists directoryExists()``
-      - 此约束检验所评定的目录是否存在。
-    * - ``PHPUnit_Framework_Constraint_FileExists fileExists()``
-      - 此约束检验所评定的文件名对应的文件是否存在。
-    * - ``PHPUnit_Framework_Constraint_IsReadable isReadable()``
-      - 此约束检验所评定的文件名对应的文件是否可读。
-    * - ``PHPUnit_Framework_Constraint_IsWritable isWritable()``
-      - 此约束检验所评定的文件名对应的文件是否可写。
-    * - ``PHPUnit_Framework_Constraint_GreaterThan greaterThan(mixed $value)``
-      - 此约束断言所评定的值大于给定值。
-    * - ``PHPUnit_Framework_Constraint_Or greaterThanOrEqual(mixed $value)``
-      - 此约束断言所评定的值大于或等于给定值。
-    * - ``PHPUnit_Framework_Constraint_ClassHasAttribute classHasAttribute(string $attributeName)``
-      - 此约束断言所评定的类具有给定属性。
-    * - ``PHPUnit_Framework_Constraint_ClassHasStaticAttribute classHasStaticAttribute(string $attributeName)``
-      - 此约束断言所评定的类具有给定静态属性。
-    * - ``PHPUnit_Framework_Constraint_ObjectHasAttribute hasAttribute(string $attributeName)``
-      - 此约束断言所评定的对象具有给定属性。
-    * - ``PHPUnit_Framework_Constraint_IsIdentical identicalTo(mixed $value)``
-      - 此约束断言所评定的值与另外一个值全等。
-    * - ``PHPUnit_Framework_Constraint_IsFalse isFalse()``
-      - 此约束断言所评定的值为 ``false``。
-    * - ``PHPUnit_Framework_Constraint_IsInstanceOf isInstanceOf(string $className)``
-      - 此约束断言所评定的对象是给定类的实例。
-    * - ``PHPUnit_Framework_Constraint_IsNull isNull()``
-      - 此约束断言所评定的值为 ``null``。
-    * - ``PHPUnit_Framework_Constraint_IsTrue isTrue()``
-      - 此约束断言所评定的值为 ``true``。
-    * - ``PHPUnit_Framework_Constraint_IsType isType(string $type)``
-      - 此约束断言所评定的值是指定类型的。
-    * - ``PHPUnit_Framework_Constraint_LessThan lessThan(mixed $value)``
-      - 此约束断言所评定的值小于给定值。
-    * - ``PHPUnit_Framework_Constraint_Or lessThanOrEqual(mixed $value)``
-      - 此约束断言所评定的值小于或等于给定值。
+    * - ``PHPUnit\Framework\Constraint\DirectoryExists directoryExists()``
+      - 此约束检查目录是否存在。
+    * - ``PHPUnit\Framework\Constraint\FileExists fileExists()``
+      - 此约束检查文件（名）是否存在。
+    * - ``PHPUnit\Framework\Constraint\IsReadable isReadable()``
+      - 此约束检查文件（名）是否可读。
+    * - ``PHPUnit\Framework\Constraint\IsWritable isWritable()``
+      - 此约束检查文件（名）是否可写。
+    * - ``PHPUnit\Framework\Constraint\GreaterThan greaterThan(mixed $value)``
+      - 此约束断言值大于给定值。
+    * - ``PHPUnit\Framework\Constraint\LogicalOr greaterThanOrEqual(mixed $value)``
+      - 此约束断言值大于或等于给定值。
+    * - ``PHPUnit\Framework\Constraint\ClassHasAttribute classHasAttribute(string $attributeName)``
+      - 此约束断言类具有给定属性。
+    * - ``PHPUnit\Framework\Constraint\ClassHasStaticAttribute classHasStaticAttribute(string $attributeName)``
+      - 此约束断言类具有给定静态属性。
+    * - ``PHPUnit\Framework\Constraint\ObjectHasAttribute objectHasAttribute(string $attributeName)``
+      - 此约束断言对象具有给定属性。
+    * - ``PHPUnit\Framework\Constraint\IsIdentical identicalTo(mixed $value)``
+      - 此约束断言值与另外一个值全等。
+    * - ``PHPUnit\Framework\Constraint\IsFalse isFalse()``
+      - 此约束断言值是 ``false``。
+    * - ``PHPUnit\Framework\Constraint\IsInstanceOf isInstanceOf(string $className)``
+      - 此约束断言对象是给定类的实例。
+    * - ``PHPUnit\Framework\Constraint\IsNull isNull()``
+      - 此约束断言值是 ``null``。
+    * - ``PHPUnit\Framework\Constraint\IsTrue isTrue()``
+      - 此约束断言值是 ``true``。
+    * - ``PHPUnit\Framework\Constraint\IsType isType(string $type)``
+      - 此约束断言值是指定的类型。
+    * - ``PHPUnit\Framework\Constraint\LessThan lessThan(mixed $value)``
+      - 此约束断言值小于给定值。
+    * - ``PHPUnit\Framework\Constraint\LogicalOr lessThanOrEqual(mixed $value)``
+      - 此约束断言值小于或等于给定值。
     * - ``logicalAnd()``
       - 逻辑与(AND)。
-    * - ``logicalNot(PHPUnit_Framework_Constraint $constraint)``
+    * - ``logicalNot(PHPUnit\Framework\Constraint $constraint)``
       - 逻辑非(NOT)。
     * - ``logicalOr()``
       - 逻辑或(OR)。
     * - ``logicalXor()``
       - 逻辑异或(XOR)。
-    * - ``PHPUnit_Framework_Constraint_PCREMatch matchesRegularExpression(string $pattern)``
-      - 此约束断言所评定的字符串匹配于正则表达式。
-    * - ``PHPUnit_Framework_Constraint_StringContains stringContains(string $string, bool $case)``
-      - 此约束断言所评定的字符串包含指定字符串。
-    * - ``PHPUnit_Framework_Constraint_StringEndsWith stringEndsWith(string $suffix)``
-      - 此约束断言所评定的字符串以给定后缀结尾。
-    * - ``PHPUnit_Framework_Constraint_StringStartsWith stringStartsWith(string $prefix)``
-      - 此约束断言所评定的字符串以给定前缀开头。
+    * - ``PHPUnit\Framework\Constraint\PCREMatch matchesRegularExpression(string $pattern)``
+      - 此约束断言字符串匹配于正则表达式。
+    * - ``PHPUnit\Framework\Constraint\StringContains stringContains(string $string, bool $case)``
+      - 此约束断言字符串包含指定字符串。
+    * - ``PHPUnit\Framework\Constraint\StringEndsWith stringEndsWith(string $suffix)``
+      - 此约束断言字符串以给定后缀结尾。
+    * - ``PHPUnit\Framework\Constraint\StringStartsWith stringStartsWith(string $prefix)``
+      - 此约束断言字符串以给定前缀开头。
 
 .. _appendixes.assertions.assertTrue:
 
@@ -2553,22 +2961,21 @@ assertTrue()
     :caption: assertTrue() 的用法
     :name: appendixes.assertions.assertTrue.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class TrueTest extends TestCase
+    final class TrueTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertTrue(false);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit TrueTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2599,23 +3006,22 @@ assertXmlFileEqualsXmlFile()
     :caption: assertXmlFileEqualsXmlFile() 的用法
     :name: appendixes.assertions.assertXmlFileEqualsXmlFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class XmlFileEqualsXmlFileTest extends TestCase
+    final class XmlFileEqualsXmlFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertXmlFileEqualsXmlFile(
               '/home/sb/expected.xml', '/home/sb/actual.xml');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit XmlFileEqualsXmlFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2654,23 +3060,22 @@ assertXmlStringEqualsXmlFile()
     :caption: assertXmlStringEqualsXmlFile() 的用法
     :name: appendixes.assertions.assertXmlStringEqualsXmlFile.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class XmlStringEqualsXmlFileTest extends TestCase
+    final class XmlStringEqualsXmlFileTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertXmlStringEqualsXmlFile(
               '/home/sb/expected.xml', '<foo><baz/></foo>');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit XmlStringEqualsXmlFileTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -2709,23 +3114,22 @@ assertXmlStringEqualsXmlString()
     :caption: assertXmlStringEqualsXmlString() 的用法
     :name: appendixes.assertions.assertXmlStringEqualsXmlString.example
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class XmlStringEqualsXmlStringTest extends TestCase
+    final class XmlStringEqualsXmlStringTest extends TestCase
     {
-        public function testFailure()
+        public function testFailure(): void
         {
             $this->assertXmlStringEqualsXmlString(
               '<foo><bar/></foo>', '<foo><baz/></foo>');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit XmlStringEqualsXmlStringTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 

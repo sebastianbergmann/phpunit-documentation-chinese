@@ -2,89 +2,89 @@
 
 .. _writing-tests-for-phpunit:
 
-=============
+=========================
 编写 PHPUnit 测试
-=============
+=========================
 
-:numref:`writing-tests-for-phpunit.examples.StackTest.php` 展示了如何用 PHPUnit 编写测试来对 PHP 数组操作进行测试。本例介绍了用 PHPUnit 编写测试的基本惯例与步骤：
-
-#.
-
-   针对类 ``Class`` 的测试写在类 ``ClassTest``中。
+:numref:`writing-tests-for-phpunit.examples.StackTest.php` 展示了如何用 PHPUnit 编写测试来对 PHP 数组操作进行测试。此示例介绍了用 PHPUnit 编写测试的基本惯例与步骤：
 
 #.
 
-   ``ClassTest``（通常）继承自 ``PHPUnit\Framework\TestCase``。
+   针对类 ``Class`` 的测试写在类 ``ClassTest`` 中。
+
+#.
+
+   ``ClassTest``\ （通常）继承自 ``PHPUnit\Framework\TestCase``。
 
 #.
 
    测试都是命名为 ``test*`` 的公用方法。
 
-   也可以在方法的文档注释块(docblock)中使用 ``@test`` 标注将其标记为测试方法。
+   也可以在方法的文档注释块（docblock）中使用 ``@test`` 标注将其标记为测试方法。
 
 #.
 
-   在测试方法内，类似于 ``assertSame()`` (参见 :ref:`appendixes.assertions`) 这样的断言方法用来对实际值与预期值的匹配做出断言。
+   在测试方法内，类似于 ``assertSame()``\ （参见\ :ref:`appendixes.assertions`）这样的断言方法用来对实际值与预期值的匹配做出断言。
 
 .. code-block:: php
     :caption: 用 PHPUnit 测试数组操作
     :name: writing-tests-for-phpunit.examples.StackTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StackTest extends TestCase
+    final class StackTest extends TestCase
     {
-        public function testPushAndPop()
+        public function testPushAndPop(): void
         {
             $stack = [];
-            $this->assertEquals(0, count($stack));
+            $this->assertSame(0, count($stack));
 
             array_push($stack, 'foo');
-            $this->assertEquals('foo', $stack[count($stack)-1]);
-            $this->assertEquals(1, count($stack));
+            $this->assertSame('foo', $stack[count($stack)-1]);
+            $this->assertSame(1, count($stack));
 
-            $this->assertEquals('foo', array_pop($stack));
-            $this->assertEquals(0, count($stack));
+            $this->assertSame('foo', array_pop($stack));
+            $this->assertSame(0, count($stack));
         }
     }
-    ?>
 
-    *Martin Fowler*:
+|
+    *Martin Fowler*：
 
-    当你想把一些东西写到 ``print`` 语句或者调试表达式中时，别这么做，将其写成一个测试来代替。
+    当你想把一些东西写到 ``print`` 语句或者调试表达式中时，别这么做，改为将其写成测试。
 
 .. _writing-tests-for-phpunit.test-dependencies:
 
 测试的依赖关系
-#######
+#################
 
-    *Adrian Kuhn et. al.*:
+    *Adrian Kuhn et. al.*：
 
-    单元测试主要是作为一种良好实践来编写的，它能帮助开发人员识别并修复 bug、重构代码，还可以看作被测软件单元的文档。要实现这些好处，理想的单元测试应当覆盖程序中所有可能的路径。一个单元测试通常覆盖一个函数或方法中的一个特定路径。但是，测试方法并不一定非要是一个封装良好的独立实体。测试方法之间经常有隐含的依赖关系暗藏在测试的实现方案中。
+    单元测试主要是作为一种良好实践来编写的，它能帮助开发人员识别并修复 bug、重构代码，还可以看作被测软件单元的文档。要实现这些好处，理想的单元测试应当覆盖程序中所有可能的路径。一个单元测试通常覆盖一个函数或方法中的一个特定路径。但是，测试方法不一定是封装良好的独立实体。测试方法之间经常有隐含的依赖关系暗藏在测试的实现方案中。
 
-PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依赖关系并不是定义在测试方法的执行顺序中，而是允许生产者(producer)返回一个测试基境(fixture)的实例，并将此实例传递给依赖于它的消费者(consumer)们。
-
--
-
-  生产者(producer)，是能生成被测单元并将其作为返回值的测试方法。
+PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依赖关系并不是定义在测试方法的执行顺序中，而是允许生产者（producer）返回一个测试基境（fixture）的实例，并将此实例传递给依赖于它的消费者（consumer）们。
 
 -
 
-  消费者(consumer)，是依赖于一个或多个生产者及其返回值的测试方法。
+  生产者（producer），是能生成被测单元并将其作为返回值的测试方法。
 
-:numref:`writing-tests-for-phpunit.examples.StackTest2.php` 展示了如何用 ``@depends`` 标注来表达测试方法之间的依赖关系。
+-
+
+  消费者（consumer），是依赖于一个或多个生产者及其返回值的测试方法。
+
+:numref:`writing-tests-for-phpunit.examples.StackTest2.php` 展示了如何用 ``@depends`` 标注来表示测试方法之间的依赖关系。
 
 .. code-block:: php
-    :caption: 用 ``@depends`` 标注来表达依赖关系
+    :caption: 用 ``@depends`` 标注来表示依赖关系
     :name: writing-tests-for-phpunit.examples.StackTest2.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class StackTest extends TestCase
+    final class StackTest extends TestCase
     {
-        public function testEmpty()
+        public function testEmpty(): array
         {
             $stack = [];
             $this->assertEmpty($stack);
@@ -95,10 +95,10 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
         /**
          * @depends testEmpty
          */
-        public function testPush(array $stack)
+        public function testPush(array $stack): array
         {
             array_push($stack, 'foo');
-            $this->assertEquals('foo', $stack[count($stack)-1]);
+            $this->assertSame('foo', $stack[count($stack)-1]);
             $this->assertNotEmpty($stack);
 
             return $stack;
@@ -107,32 +107,31 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
         /**
          * @depends testPush
          */
-        public function testPop(array $stack)
+        public function testPop(array $stack): void
         {
-            $this->assertEquals('foo', array_pop($stack));
+            $this->assertSame('foo', array_pop($stack));
             $this->assertEmpty($stack);
         }
     }
-    ?>
 
-在上例中，第一个测试， ``testEmpty()``，创建了一个新数组，并断言其为空。随后，此测试将此基境作为结果返回。第二个测试，``testPush()``，依赖于 ``testEmpty()`` ，并将所依赖的测试之结果作为参数传入。最后，``testPop()`` 依赖于 ``testPush()``。
+在上例中，第一个测试\ ``testEmpty()`` 创建了一个新数组，并断言其为空。随后，此测试将此基境作为结果返回。第二个测试 ``testPush()`` 依赖于 ``testEmpty()``，并将所依赖的测试之结果作为参数传入。最后，``testPop()`` 依赖于 ``testPush()``。
 
-.. admonition:: Note
+.. admonition:: 注
 
-   默认情况下，生产者所产生的返回值将“原样”传递给相应的消费者。这意味着，如果生产者返回的是一个对象，那么传递给消费者的将是一个指向此对象的引用。如果需要传递对象的副本而非引用，则应当用 @depends clone 替代 @depends。
+   默认情况下，生产者所产生的返回值将“原样”传递给相应的消费者。这意味着，如果生产者返回的是一个对象，那么传递给消费者的将是指向此对象的引用。但同样也可以（a）通过 ``@depends clone`` 来传递指向（深）拷贝对象的引用，或（b）通过 ``@depends shallowClone`` 来传递指向（正常浅）克隆对象（基于 PHP 关键字 ``clone``）的引用。
 
-为了快速定位缺陷，我们希望把注意力集中于相关的失败测试上。这就是为什么当某个测试所依赖的测试失败时，PHPUnit 会跳过这个测试。通过利用测试之间的依赖关系，缺陷定位得到了改进，如 :numref:`writing-tests-for-phpunit.examples.DependencyFailureTest.php` 中所示。
+为了定位缺陷，我们希望把注意力集中于相关的失败测试上。这就是为什么当某个测试所依赖的测试失败时，PHPUnit 会跳过这个测试。利用测试之间的依赖关系可以改进缺陷定位，如\ :numref:`writing-tests-for-phpunit.examples.DependencyFailureTest.php` 所示。
 
 .. code-block:: php
     :caption: 利用测试之间的依赖关系
     :name: writing-tests-for-phpunit.examples.DependencyFailureTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DependencyFailureTest extends TestCase
+    final class DependencyFailureTest extends TestCase
     {
-        public function testOne()
+        public function testOne(): void
         {
             $this->assertTrue(false);
         }
@@ -140,16 +139,15 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
         /**
          * @depends testOne
          */
-        public function testTwo()
+        public function testTwo(): void
         {
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit --verbose DependencyFailureTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     FS
 
@@ -172,26 +170,28 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
 
 测试可以使用多个 ``@depends`` 标注。PHPUnit 不会更改测试的运行顺序，因此你需要自行保证某个测试所依赖的所有测试均出现于这个测试之前。
 
-拥有多个 ``@depends`` 标注的测试，其第一个参数是第一个生产者提供的基境，第二个参数是第二个生产者提供的基境，以此类推。参见 :numref:`writing-tests-for-phpunit.examples.MultipleDependencies.php`
+拥有多个 ``@depends`` 标注的测试，其第一个参数是第一个生产者提供的基境，第二个参数是第二个生产者提供的基境，以此类推。参见\ :numref:`writing-tests-for-phpunit.examples.MultipleDependencies.php`
 
 .. code-block:: php
-    :caption: 有多重依赖的测试
+    :caption: 有多个依赖项的测试
     :name: writing-tests-for-phpunit.examples.MultipleDependencies.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class MultipleDependenciesTest extends TestCase
+    final class MultipleDependenciesTest extends TestCase
     {
-        public function testProducerFirst()
+        public function testProducerFirst(): string
         {
             $this->assertTrue(true);
+
             return 'first';
         }
 
-        public function testProducerSecond()
+        public function testProducerSecond(): string
         {
             $this->assertTrue(true);
+
             return 'second';
         }
 
@@ -199,33 +199,30 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
          * @depends testProducerFirst
          * @depends testProducerSecond
          */
-        public function testConsumer()
+        public function testConsumer(string $a, string $b): void
         {
-            $this->assertEquals(
-                ['first', 'second'],
-                func_get_args()
-            );
+            $this->assertSame('first', $a);
+            $this->assertSame('second', $b);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit --verbose MultipleDependenciesTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     ...
 
     Time: 0 seconds, Memory: 3.25Mb
 
-    OK (3 tests, 3 assertions)
+    OK (3 tests, 4 assertions)
 
 .. _writing-tests-for-phpunit.data-providers:
 
 数据供给器
-#####
+##############
 
-测试方法可以接受任意参数。这些参数由数据供给器方法（在 :numref:`writing-tests-for-phpunit.data-providers.examples.DataTest.php` 中，是 ``additionProvider()`` 方法）提供。用 ``@dataProvider`` 标注来指定使用哪个数据供给器方法。
+测试方法可以接受任意参数。这些参数由一个或多个数据供给器方法（在\ :numref:`writing-tests-for-phpunit.data-providers.examples.DataTest.php` 中，是 ``additionProvider()`` 方法）提供。用 ``@dataProvider`` 标注来指定要使用的数据供给器方法。
 
 数据供给器方法必须声明为 ``public``，其返回值要么是一个数组，其每个元素也是数组；要么是一个实现了 ``Iterator`` 接口的对象，在对它进行迭代时每步产生一个数组。每个数组都是测试数据集的一部分，将以它的内容作为参数来调用测试方法。
 
@@ -233,20 +230,20 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     :caption: 使用返回数组的数组的数据供给器
     :name: writing-tests-for-phpunit.data-providers.examples.DataTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DataTest extends TestCase
+    final class DataTest extends TestCase
     {
         /**
          * @dataProvider additionProvider
          */
-        public function testAdd($a, $b, $expected)
+        public function testAdd(int $a, int $b, int $expected): void
         {
-            $this->assertEquals($expected, $a + $b);
+            $this->assertSame($expected, $a + $b);
         }
 
-        public function additionProvider()
+        public function additionProvider(): array
         {
             return [
                 [0, 0, 0],
@@ -256,12 +253,11 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
             ];
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DataTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     ...F
 
@@ -270,7 +266,7 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) DataTest::testAdd with data set #3 (1, 1, 3)
-    Failed asserting that 2 matches expected 3.
+    Failed asserting that 2 is identical to 3.
 
     /home/sb/DataTest.php:9
 
@@ -280,23 +276,23 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
 当使用到大量数据集时，最好逐个用字符串键名对其命名，避免用默认的数字键名。这样输出信息会更加详细些，其中将包含打断测试的数据集所对应的名称。
 
 .. code-block:: php
-    :caption: 使用带有命名数据集的数据供给器
+    :caption: 将数据供给器与命名数据集一起使用
     :name: writing-tests-for-phpunit.data-providers.examples.DataTest1.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DataTest extends TestCase
+    final class DataTest extends TestCase
     {
         /**
          * @dataProvider additionProvider
          */
-        public function testAdd($a, $b, $expected)
+        public function testAdd(int $a, int $b, int $expected): void
         {
-            $this->assertEquals($expected, $a + $b);
+            $this->assertSame($expected, $a + $b);
         }
 
-        public function additionProvider()
+        public function additionProvider(): array
         {
             return [
                 'adding zeros'  => [0, 0, 0],
@@ -306,12 +302,11 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
             ];
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DataTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     ...F
 
@@ -320,7 +315,7 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) DataTest::testAdd with data set "one plus one" (1, 1, 3)
-    Failed asserting that 2 matches expected 3.
+    Failed asserting that 2 is identical to 3.
 
     /home/sb/DataTest.php:9
 
@@ -328,35 +323,32 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     Tests: 4, Assertions: 4, Failures: 1.
 
 .. code-block:: php
-    :caption: 使用返回迭代器对象的数据供给器
+    :caption: 使用返回 Iterator 对象的数据供给器
     :name: writing-tests-for-phpunit.data-providers.examples.DataTest2.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    require 'CsvFileIterator.php';
-
-    class DataTest extends TestCase
+    final class DataTest extends TestCase
     {
         /**
          * @dataProvider additionProvider
          */
-        public function testAdd($a, $b, $expected)
+        public function testAdd(int $a, int $b, int $expected): void
         {
-            $this->assertEquals($expected, $a + $b);
+            $this->assertSame($expected, $a + $b);
         }
 
-        public function additionProvider()
+        public function additionProvider(): CsvFileIterator
         {
             return new CsvFileIterator('data.csv');
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit DataTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     ...F
 
@@ -365,7 +357,7 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) DataTest::testAdd with data set #3 ('1', '1', '3')
-    Failed asserting that 2 matches expected '3'.
+    Failed asserting that 2 is identical to 3.
 
     /home/sb/DataTest.php:11
 
@@ -376,72 +368,83 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     :caption: CsvFileIterator 类
     :name: writing-tests-for-phpunit.data-providers.examples.CsvFileIterator.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class CsvFileIterator implements Iterator {
-        protected $file;
-        protected $key = 0;
-        protected $current;
+    final class CsvFileIterator implements Iterator
+    {
+        private $file;
+        private $key = 0;
+        private $current;
 
-        public function __construct($file) {
+        public function __construct(string $file)
+        {
             $this->file = fopen($file, 'r');
         }
 
-        public function __destruct() {
+        public function __destruct()
+        {
             fclose($this->file);
         }
 
-        public function rewind() {
+        public function rewind(): void
+        {
             rewind($this->file);
+
             $this->current = fgetcsv($this->file);
-            $this->key = 0;
+            $this->key     = 0;
         }
 
-        public function valid() {
+        public function valid(): bool
+        {
             return !feof($this->file);
         }
 
-        public function key() {
+        public function key(): int
+        {
             return $this->key;
         }
 
-        public function current() {
+        public function current(): array
+        {
             return $this->current;
         }
 
-        public function next() {
+        public function next(): void
+        {
             $this->current = fgetcsv($this->file);
+
             $this->key++;
         }
     }
-    ?>
 
-如果测试同时从 ``@dataProvider`` 方法和一个或多个 ``@depends`` 测试接收数据，那么来自于数据供给器的参数将先于来自所依赖的测试的。来自于所依赖的测试的参数对于每个数据集都是一样的。参见:numref:`writing-tests-for-phpunit.data-providers.examples.DependencyAndDataProviderCombo.php`
+如果测试同时从 ``@dataProvider`` 方法和一个或多个 ``@depends`` 测试接收数据，那么来自于数据供给器的参数将先于来自所依赖的测试的。来自于所依赖的测试的参数对于每个数据集都是一样的。参见\ :numref:`writing-tests-for-phpunit.data-providers.examples.DependencyAndDataProviderCombo.php`
 
 .. code-block:: php
-    :caption: 在同一个测试中组合使用 @depends 和 @dataProvider
+    :caption: 在同一个测试中组合 @depends 和 @dataProvider
     :name: writing-tests-for-phpunit.data-providers.examples.DependencyAndDataProviderCombo.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class DependencyAndDataProviderComboTest extends TestCase
+    final class DependencyAndDataProviderComboTest extends TestCase
     {
-        public function provider()
+        public function provider(): array
         {
             return [['provider1'], ['provider2']];
         }
 
-        public function testProducerFirst()
+        public function testProducerFirst(): void
         {
             $this->assertTrue(true);
+
             return 'first';
         }
 
-        public function testProducerSecond()
+        public function testProducerSecond(): void
         {
             $this->assertTrue(true);
+
             return 'second';
         }
 
@@ -450,20 +453,19 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
          * @depends testProducerSecond
          * @dataProvider provider
          */
-        public function testConsumer()
+        public function testConsumer(): void
         {
-            $this->assertEquals(
+            $this->assertSame(
                 ['provider1', 'first', 'second'],
                 func_get_args()
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit --verbose DependencyAndDataProviderComboTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     ...F
 
@@ -472,57 +474,111 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) DependencyAndDataProviderComboTest::testConsumer with data set #1 ('provider2')
-    Failed asserting that two arrays are equal.
+    Failed asserting that two arrays are identical.
     --- Expected
     +++ Actual
     @@ @@
-    Array (
+    Array &0 (
     -    0 => 'provider1'
     +    0 => 'provider2'
-    1 => 'first'
-    2 => 'second'
+         1 => 'first'
+         2 => 'second'
     )
-
-    /home/sb/DependencyAndDataProviderComboTest.php:31
+    /home/sb/DependencyAndDataProviderComboTest.php:32
 
     FAILURES!
     Tests: 4, Assertions: 4, Failures: 1.
 
-.. admonition:: Note
+.. code-block:: php
+    :caption: 对单个测试使用多个数据供给器
+    :name: writing-tests-for-phpunit.data-providers.examples2.DataTest.php
+
+    <?php declare(strict_types=1);
+    use PHPUnit\Framework\TestCase;
+
+    final class DataTest extends TestCase
+    {
+        /**
+         * @dataProvider additionWithNonNegativeNumbersProvider
+         * @dataProvider additionWithNegativeNumbersProvider
+         */
+        public function testAdd(int $a, int $b, int $expected): void
+        {
+            $this->assertSame($expected, $a + $b);
+        }
+
+        public function additionWithNonNegativeNumbersProvider(): void
+        {
+            return [
+                [0, 1, 1],
+                [1, 0, 1],
+                [1, 1, 3]
+            ];
+        }
+
+        public function additionWithNegativeNumbersProvider(): array
+        {
+            return [
+                [-1, 1, 0],
+                [-1, -1, -2],
+                [1, -1, 0]
+            ];
+        }
+     }
+
+.. parsed-literal::
+
+    $ phpunit DataTest
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
+
+    ..F...                                                              6 / 6 (100%)
+
+    Time: 0 seconds, Memory: 5.75Mb
+
+    There was 1 failure:
+
+    1) DataTest::testAdd with data set #3 (1, 1, 3)
+    Failed asserting that 2 is identical to 3.
+
+    /home/sb/DataTest.php:12
+
+    FAILURES!
+    Tests: 6, Assertions: 6, Failures: 1.
+
+.. admonition:: 注
 
    如果一个测试依赖于另外一个使用了数据供给器的测试，仅当被依赖的测试至少能在一组数据上成功时，依赖于它的测试才会运行。使用了数据供给器的测试，其运行结果是无法注入到依赖于此测试的其他测试中的。
 
-.. admonition:: Note
+.. admonition:: 注
 
-   所有的数据供给器方法的执行都是在对 ``setUpBeforeClass`` 静态方法的调用和第一次对 ``setUp`` 方法的调用之前完成的。因此，无法在数据供给器中使用创建于这两个方法内的变量。这是必须的，这样 PHPUnit 才能计算测试的总数量。
+   所有数据供给器方法的执行都是在对 ``setUpBeforeClass()`` 静态方法的调用和第一次对 ``setUp()`` 方法的调用之前完成的。因此，无法在数据供给器中使用创建于这两个方法内的变量。这是必须的，这样 PHPUnit 才能计算测试的总数量。
 
 .. _writing-tests-for-phpunit.exceptions:
 
 对异常进行测试
-#######
+##################
 
-:numref:`writing-tests-for-phpunit.exceptions.examples.ExceptionTest.php`展示了如何用 ``@expectException`` 标注来测试被测代码中是否抛出了异常。
+:numref:`writing-tests-for-phpunit.exceptions.examples.ExceptionTest.php` 展示了如何用 ``@expectException`` 标注来测试被测代码中是否抛出了异常。
 
 .. code-block:: php
     :caption: 使用 expectException() 方法
     :name: writing-tests-for-phpunit.exceptions.examples.ExceptionTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ExceptionTest extends TestCase
+    final class ExceptionTest extends TestCase
     {
-        public function testException()
+        public function testException(): void
         {
             $this->expectException(InvalidArgumentException::class);
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ExceptionTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -531,129 +587,127 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) ExceptionTest::testException
-    Expected exception InvalidArgumentException
+    Failed asserting that exception of type "InvalidArgumentException" is thrown.
 
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-除了 ``expectException()`` 方法外，还有 ``expectExceptionCode()``、``expectExceptionMessage()`` 和 ``expectExceptionMessageRegExp()`` 方法可以用于为被测代码所抛出的异常建立预期。
+除了 ``expectException()`` 方法外，还有 ``expectExceptionCode()``、``expectExceptionMessage()`` 和 ``expectExceptionMessageMatches()`` 方法可以用于为被测代码所抛出的异常建立预期。
 
-或者，也可以用 ``@expectedException``、``@expectedExceptionCode``、``@expectedExceptionMessage`` 和 ``@expectedExceptionMessageRegExp`` 标注来为被测代码所抛出的异常建立预期。:numref:`writing-tests-for-phpunit.exceptions.examples.ExceptionTest2.php`展示了一个范例。
+.. admonition:: 注
 
-.. code-block:: php
-    :caption: 使用 @expectedException 标注
-    :name: writing-tests-for-phpunit.exceptions.examples.ExceptionTest2.php
-
-    <?php
-    use PHPUnit\Framework\TestCase;
-
-    class ExceptionTest extends TestCase
-    {
-        /**
-         * @expectedException InvalidArgumentException
-         */
-        public function testException()
-        {
-        }
-    }
-    ?>
-
-.. code-block:: bash
-
-    $ phpunit ExceptionTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
-
-    F
-
-    Time: 0 seconds, Memory: 4.75Mb
-
-    There was 1 failure:
-
-    1) ExceptionTest::testException
-    Expected exception InvalidArgumentException
-
-    FAILURES!
-    Tests: 1, Assertions: 1, Failures: 1.
+   注意 ``expectExceptionMessage()`` 断言的是 ``$actual`` 讯息包含有 ``$expected`` 讯息，并不执行精确的字符串比较。
 
 .. _writing-tests-for-phpunit.errors:
 
-对 PHP 错误进行测试
-############
+对 PHP 错误、警告和通知进行测试
+#########################################
 
-默认情况下，PHPUnit 将测试在执行中触发的 PHP 错误、警告、通知都转换为异常。利用这些异常，就可以，比如说，预期测试将触发 PHP 错误，如:numref:`writing-tests-for-phpunit.exceptions.examples.ErrorTest.php`所示。
+默认情况下，PHPUnit 将测试在执行中触发的 PHP 错误、警告、通知都转换为异常。先不说其他好处，这样就可以预期在测试中会触发 PHP 错误、警告或通知，如\ :numref:`writing-tests-for-phpunit.exceptions.examples.ErrorTest.php` 所示。
 
-.. admonition:: Note
+.. admonition:: 注
 
-   PHP 的 ``error_reporting`` 运行时配置会对 PHPUnit 将哪些错误转换为异常有所限制。如果在这个特性上碰到问题，请确认 PHP 的配置中没有抑制想要测试的错误类型。
+   PHP 的 ``error_reporting`` 运行时配置会对 PHPUnit 将哪些错误转换为异常有所限制。如果在这个特性上碰到问题，请确认 PHP 的配置中没有抑制你所关注的错误类型。
 
 .. code-block:: php
-    :caption: 用 @expectedException 来预期 PHP 错误
+    :caption: 预期会出现 PHP 错误、警告和通知
     :name: writing-tests-for-phpunit.exceptions.examples.ErrorTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ExpectedErrorTest extends TestCase
+    final class ErrorTest extends TestCase
     {
-        /**
-         * @expectedException PHPUnit\Framework\Error
-         */
-        public function testFailingInclude()
+        public function testDeprecationCanBeExpected(): void
         {
-            include 'not_existing_file.php';
+            $this->expectDeprecation();
+
+            // （可选）测试讯息和某个字符串相等
+            $this->expectDeprecationMessage('foo');
+
+            // 或者（可选）测试讯息和某个正则表达式匹配
+            $this->expectDeprecationMessageMatches('/foo/');
+
+            \trigger_error('foo', \E_USER_DEPRECATED);
+        }
+
+        public function testNoticeCanBeExpected(): void
+        {
+            $this->expectNotice();
+
+            // （可选）测试讯息和某个字符串相等
+            $this->expectNoticeMessage('foo');
+
+            // 或者（可选）测试讯息和某个正则表达式匹配
+            $this->expectNoticeMessageMatches('/foo/');
+
+            \trigger_error('foo', \E_USER_NOTICE);
+        }
+
+        public function testWarningCanBeExpected(): void
+        {
+            $this->expectWarning();
+
+            // （可选）测试讯息和某个字符串相等
+            $this->expectWarningMessage('foo');
+
+            // 或者（可选）测试讯息和某个正则表达式匹配
+            $this->expectWarningMessageMatches('/foo/');
+
+            \trigger_error('foo', \E_USER_WARNING);
+        }
+
+        public function testErrorCanBeExpected(): void
+        {
+            $this->expectError();
+
+            // （可选）测试讯息和某个字符串相等
+            $this->expectErrorMessage('foo');
+
+            // 或者（可选）测试讯息和某个正则表达式匹配
+            $this->expectErrorMessageMatches('/foo/');
+
+            \trigger_error('foo', \E_USER_ERROR);
         }
     }
-    ?>
 
-.. code-block:: bash
+如果测试代码使用了会触发错误的 PHP 内建函数，比如 ``fopen``，有时候在测试中使用错误抑制符会很有用。通过抑制住错误通知，就能对返回值进行检查，否则错误通知将会导致 PHPUnit 的错误处理程序抛出异常。
 
-    $ phpunit -d error_reporting=2 ExpectedErrorTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
-
-    .
-
-    Time: 0 seconds, Memory: 5.25Mb
-
-    OK (1 test, 1 assertion)
-
-``PHPUnit\Framework\Error\Notice`` 和 ``PHPUnit\Framework\Error\Warning`` 分别代表 PHP 通知与 PHP 警告。
-
-.. admonition:: Note
-
-   对异常进行测试是越明确越好的。对太笼统的类进行测试有可能导致不良副作用。因此，不再允许用 ``@expectedException`` 或 ``setExpectedException()`` 对 ``Exception`` 类进行测试。
-
-如果测试依靠会触发错误的 PHP 函数，例如 ``fopen`` ，有时候在测试中使用错误抑制符会很有用。通过抑制住错误通知，就能对返回值进行检查，否则错误通知将会导致抛出 ``PHPUnit\Framework\Error\Notice``。
 .. code-block:: php
     :caption: 对会引发PHP 错误的代码的返回值进行测试
     :name: writing-tests-for-phpunit.exceptions.examples.TriggerErrorReturnValue.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ErrorSuppressionTest extends TestCase
+    final class ErrorSuppressionTest extends TestCase
     {
-        public function testFileWriting() {
+        public function testFileWriting(): void
+        {
             $writer = new FileWriter;
+
             $this->assertFalse(@$writer->write('/is-not-writeable/file', 'stuff'));
         }
     }
-    class FileWriter
+
+    final class FileWriter
     {
-        public function write($file, $content) {
+        public function write($file, $content)
+        {
             $file = fopen($file, 'w');
-            if($file == false) {
+
+            if ($file === false) {
                 return false;
             }
+
             // ...
         }
     }
 
-    ?>
-
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ErrorSuppressionTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     .
 
@@ -666,9 +720,9 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
 .. _writing-tests-for-phpunit.output:
 
 对输出进行测试
-#######
+##############
 
-有时候，想要断言（比如说）某方法的运行过程中生成了预期的输出（例如，通过 ``echo`` 或 ``print``）。``PHPUnit\Framework\TestCase`` 类使用 PHP 的 `输出缓冲 <http://www.php.net/manual/en/ref.outcontrol.php>`_ 特性来为此提供必要的功能支持。
+有时候，想要断言（比如说）某方法的运行过程中生成了预期的输出（例如，通过 ``echo`` 或 ``print``）。\ ``PHPUnit\Framework\TestCase`` 类使用 PHP 的\ `输出缓冲 <http://www.php.net/manual/en/ref.outcontrol.php>`_\ 特性来为此提供必要的功能支持。
 
 :numref:`writing-tests-for-phpunit.output.examples.OutputTest.php` 展示了如何用 ``expectOutputString()`` 方法来设定所预期的输出。如果没有产生预期的输出，测试将计为失败。
 
@@ -676,29 +730,30 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     :caption: 对函数或方法的输出进行测试
     :name: writing-tests-for-phpunit.output.examples.OutputTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class OutputTest extends TestCase
+    final class OutputTest extends TestCase
     {
-        public function testExpectFooActualFoo()
+        public function testExpectFooActualFoo(): void
         {
             $this->expectOutputString('foo');
+
             print 'foo';
         }
 
-        public function testExpectBarActualBaz()
+        public function testExpectBarActualBaz(): void
         {
             $this->expectOutputString('bar');
+
             print 'baz';
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit OutputTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     .F
 
@@ -717,10 +772,11 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     FAILURES!
     Tests: 2, Assertions: 2, Failures: 1.
 
-:numref:`writing-tests-for-phpunit.output.tables.api` 中列举了用于对输出进行测试的各种方法。
+:numref:`writing-tests-for-phpunit.output.tables.api`
+中列举了用于对输出进行测试的各种方法
 
 .. rst-class:: table
-.. list-table:: 用于对输出进行测试的方法
+.. list-table:: 测试输出的方法
     :name: writing-tests-for-phpunit.output.tables.api
     :header-rows: 1
 
@@ -729,45 +785,45 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     * - ``void expectOutputRegex(string $regularExpression)``
       - 设置输出预期为输出应当匹配正则表达式 ``$regularExpression``。
     * - ``void expectOutputString(string $expectedString)``
-      - 设置输出预期为输出应当与 ``$expectedString`` 字符串相等。
+      - 设置输出预期为输出应当与 ``$expectedString`` 相等。
     * - ``bool setOutputCallback(callable $callback)``
       - 设置回调函数，用来做诸如将实际输出规范化之类的动作。
     * - ``string getActualOutput()``
       - 获取实际输出。
 
-.. admonition:: Note
+.. admonition:: 注
 
    在严格模式下，本身产生输出的测试将会失败。
 
 .. _writing-tests-for-phpunit.error-output:
 
 错误相关信息的输出
-#########
+###################
 
 当有测试失败时，PHPUnit 全力提供尽可能多的有助于找出问题所在的上下文信息。
 
 .. code-block:: php
-    :caption: 数组比较失败时生成的错误相关信息输出
+    :caption: 数组比较失败时生成的错误输出
     :name: writing-tests-for-phpunit.error-output.examples.ArrayDiffTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ArrayDiffTest extends TestCase
+    final class ArrayDiffTest extends TestCase
     {
-        public function testEquality() {
-            $this->assertEquals(
+        public function testEquality(): void
+        {
+            $this->assertSame(
                 [1, 2,  3, 4, 5, 6],
                 [1, 2, 33, 4, 5, 6]
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ArrayDiffTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -776,7 +832,7 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) ArrayDiffTest::testEquality
-    Failed asserting that two arrays are equal.
+    Failed asserting that two arrays are identical.
     --- Expected
     +++ Actual
     @@ @@
@@ -800,27 +856,27 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
 当生成的输出很长而难以阅读时，PHPUnit 将对其进行分割，并在每个差异附近提供少数几行上下文信息。
 
 .. code-block:: php
-    :caption: 长数组比较失败时生成的错误相关信息输出
+    :caption: 长数组的数组比较失败时的错误输出
     :name: writing-tests-for-phpunit.error-output.examples.LongArrayDiffTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class LongArrayDiffTest extends TestCase
+    final class LongArrayDiffTest extends TestCase
     {
-        public function testEquality() {
-            $this->assertEquals(
+        public function testEquality(): void
+        {
+            $this->assertSame(
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2,  3, 4, 5, 6],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 33, 4, 5, 6]
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit LongArrayDiffTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -829,10 +885,12 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     There was 1 failure:
 
     1) LongArrayDiffTest::testEquality
-    Failed asserting that two arrays are equal.
+    Failed asserting that two arrays are identical.
     --- Expected
     +++ Actual
     @@ @@
+         11 => 0
+         12 => 1
          13 => 2
     -    14 => 3
     +    14 => 33
@@ -849,34 +907,34 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
 .. _writing-tests-for-phpunit.error-output.edge-cases:
 
 边缘情况
-====
+==========
 
 当比较失败时，PHPUnit 为输入值建立文本表示，然后以此进行对比。这种实现导致在差异指示中显示出来的问题可能比实际上存在的多。
 
-这种情况只出现在对数组或者对象使用 assertEquals 或其他“弱”比较函数时。
+这种情况只出现在对数组或者对象使用 ``assertEquals()`` 或其他“弱”比较函数时。
 
 .. code-block:: php
-    :caption: 当使用弱比较时在生成的差异结果中出现的边缘情况
+    :caption: 使用弱比较时在差异生成过程中的边缘情况
     :name: writing-tests-for-phpunit.error-output.edge-cases.examples.ArrayWeakComparisonTest.php
 
-    <?php
+    <?php declare(strict_types=1);
     use PHPUnit\Framework\TestCase;
 
-    class ArrayWeakComparisonTest extends TestCase
+    final class ArrayWeakComparisonTest extends TestCase
     {
-        public function testEquality() {
+        public function testEquality(): void
+        {
             $this->assertEquals(
                 [1, 2, 3, 4, 5, 6],
                 ['1', 2, 33, 4, 5, 6]
             );
         }
     }
-    ?>
 
-.. code-block:: bash
+.. parsed-literal::
 
     $ phpunit ArrayWeakComparisonTest
-    PHPUnit 7.0.0 by Sebastian Bergmann and contributors.
+    PHPUnit |version|.0 by Sebastian Bergmann and contributors.
 
     F
 
@@ -905,6 +963,6 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
     FAILURES!
     Tests: 1, Assertions: 1, Failures: 1.
 
-在这个例子中，第一个索引项中的 ``1`` and ``'1'`` 在报告中被视为不同，虽然 assertEquals 认为这两个值是匹配的。
+在这个例子中，第一个索引项中的 ``1`` 和 ``'1'`` 在报告中被视为不同，虽然 ``assertEquals()`` 认为这两个值是匹配的。
 
 

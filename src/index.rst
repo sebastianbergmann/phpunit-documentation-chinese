@@ -1,14 +1,14 @@
 ==============
-PHPUnit Manual
+PHPUnit 手册
 ==============
 
-Edition for PHPUnit |version|. Updated on |today|.
+此版本对应于 PHPUnit |version|。最后更新于 |today|。
 
 Sebastian Bergmann
 
-This work is licensed under the Creative Commons Attribution 3.0 Unported License.
+本作品依据 Creative Commons Attribution 3.0 Unported 许可协议进行授权。
 
-Contents:
+内容：
 
 .. toctree::
    :maxdepth: 3
@@ -21,12 +21,8 @@ Contents:
    organizing-tests
    risky-tests
    incomplete-and-skipped-tests
-   database
    test-doubles
-   testing-practices
    code-coverage-analysis
-   other-uses-for-tests
-   logging
    extending-phpunit
 
 .. toctree::

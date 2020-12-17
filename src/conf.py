@@ -24,13 +24,13 @@ def get_version():
     if os.environ.get('READTHEDOCS') == 'True':
         return os.environ.get('READTHEDOCS_VERSION')
 
-    pipe = Popen('git branch | grep \*', stdout=PIPE, shell=True)
+    pipe = Popen('git branch | grep \*', stdout=PIPE, shell=True, universal_newlines=True)
     version = pipe.stdout.read()
 
     if version:
         return version[2:]
     else:
-        return 'unknown'
+        return '(未知)'
 
 highlight_language = 'php'
 
@@ -71,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PHPUnit'
-copyright = u'2018, Sebastian Bergmann'
+copyright = u'2020, Sebastian Bergmann'
 author = u'Sebastian Bergmann'
 epub_author = u'Sebastian Bergmann'
 
@@ -95,7 +95,7 @@ language = None
 # non-false value, then it is used:
 #today = ''
 # Else, today_fmt is used as the format for a strftime call.
-#today_fmt = '%B %d, %Y'
+today_fmt = '%Y-%m-%d'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -144,7 +144,7 @@ html_add_permalinks = ""
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "PHPUnit %s Manual" % get_version()
+html_title = "PHPUnit %s 手册" % get_version()
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -226,11 +226,19 @@ html_show_sphinx = False
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'PHPUnitdoc'
 
+html_context = {
+    "display_github": True,
+    "github_user": "sebastianbergmann",
+    "github_repo": "phpunit-documentation-chinese",
+    "github_version": version,
+    "conf_py_path": "/src/",
+}
+
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+'papersize': 'a4paper',
 
 # The font size ('10pt', '11pt' or '12pt').
 #'pointsize': '10pt',
@@ -246,7 +254,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'PHPUnit.tex', u'PHPUnit Manual',
+  (master_doc, 'PHPUnit.tex', u'PHPUnit 手册',
    u'Sebastian Bergmann', 'manual'),
 ]
 
@@ -276,7 +284,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'phpunit', u'PHPUnit Documentation',
+    (master_doc, 'phpunit', u'PHPUnit 文档',
      [author], 1)
 ]
 
@@ -290,7 +298,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'PHPUnit', u'PHPUnit Manual',
+  (master_doc, 'PHPUnit', u'PHPUnit 手册',
    author, 'PHPUnit', 'One line description of project.',
    'Miscellaneous'),
 ]
@@ -310,10 +318,10 @@ texinfo_documents = [
 numfig = True
 
 numfig_format = {
-    'code-block': 'Example %s',
-    'figure': 'Figure %s',
-    'table': 'Table %s',
-    'section': 'Section'
+    'code-block': '示例 %s',
+    'figure': '图表 %s',
+    'table': '表格 %s',
+    'section': '章节'
 }
 
 
