@@ -507,7 +507,7 @@ PHPUnit支持对测试方法之间的显式依赖关系进行声明。这种依�
             $this->assertSame($expected, $a + $b);
         }
 
-        public function additionWithNonNegativeNumbersProvider(): void
+        public function additionWithNonNegativeNumbersProvider(): array
         {
             return [
                 [0, 1, 1],
