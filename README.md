@@ -1,3 +1,5 @@
+**The PHPUnit project is no longer involved with the translation of its documentation to other languages. This repository is now archived.**
+
 # 翻译
 
 文档的每一种翻译都用单独的存储库来维护：
